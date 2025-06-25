@@ -7,6 +7,7 @@ export class BootScene extends Phaser.Scene {
         const basePath = window.location.pathname.replace(/\/[^\/]*$/, '');
         const img = `${basePath}/assets/images`;
         const msg = `${basePath}/src/msgs`;
+        const sound = `${basePath}/assets/sounds`;
 
         this.load.image('title', `${img}/title.png`);
         for (let i = 1; i <= 7; i++)
@@ -23,6 +24,8 @@ export class BootScene extends Phaser.Scene {
 
         // 대사 메시지 JSON 로드
         this.load.json('PrologueDialogues', `${msg}/Prologue.json`);
+
+        this.load.audio('prologueBGM', [`${sound}/prologue.mp3`]);  
     }
 
     create() {
