@@ -1,0 +1,30 @@
+body {
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center; /* 가로 중앙 정렬 */
+    align-items: center;    /* 세로 중앙 정렬 */
+    height: 100vh;          /* 화면 전체 높이 */
+    background: black;
+    overflow: hidden;       /* 스크롤 제거 */
+    font-family: Arial, sans-serif;
+    color:white;
+    align-items: center;
+}
+
+/* '빛의 계승자' 폰트 */
+@font-face {
+  font-family: "HeirofLightBold";
+  src: url("../assets/fonts/HeirofLightBold.ttf") format("truetype");
+  font-weight: normal;
+}
+@font-face {
+  font-family: "HeirofLightRegular";
+  src: url("../assets/fonts/HeirofLightRegular.ttf") format("truetype");
+  font-weight: normal;
+}
+
+canvas {
+    display: block;
+    margin: auto;
+}

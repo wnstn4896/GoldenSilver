@@ -1,0 +1,36 @@
+import { MessageModule } from './MessageModule.js';
+
+export class PrologueScene extends Phaser.Scene {
+    constructor() {
+        super({ key: 'PrologueScene' });
+        this.dialogues = [];
+        this.currentIndex = 0;
+    }
+
+    create() {
+        this.dialogues = this.cache.json.get('PrologueDialogues');
+        this.MessageModule = new MessageModule(this);
+        this.MessageModule.createUI();
+        this.onNextDialogue();
+    }
+
+    onNextDialogue() {
+        // 대사 출력 진행
+        if (this.currentIndex < this.dialogues.length) {
+            const dialogue = this.dialogues[this.currentIndex];
+            this.MessageModule.updateDialogue(dialogue, () => {
+                this.currentIndex++;
+                this.onNextDialogue();
+            });
+            // 플래시 효과
+            this.cameras.main.flash(1000, 0, 0, 0);
+        } else {
+            this.endScene();
+        }
+    }
+    
+    endScene() {
+        window.location.reload();
+    }
+    
+}
