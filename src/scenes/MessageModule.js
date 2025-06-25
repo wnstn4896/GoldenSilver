@@ -32,7 +32,7 @@ export class MessageModule {
 
         // 캐릭터 이름 텍스트
         this.uiElements.nameText = scene.add.text(150, 467, '', {
-            fontFamily: 'HeirofLightRegular',
+            fontFamily: 'HeirofLightBold',
             fontSize: '20px',
             color: '#ffffff',
             padding: { top: 2, bottom: 2 },
