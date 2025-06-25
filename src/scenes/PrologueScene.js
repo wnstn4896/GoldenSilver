@@ -12,6 +12,8 @@ export class PrologueScene extends Phaser.Scene {
         this.MessageModule = new MessageModule(this);
         this.MessageModule.createUI();
         this.onNextDialogue();
+
+        this.sound.add('prologueBGM').play();
     }
 
     onNextDialogue() {
