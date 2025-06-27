@@ -24,6 +24,9 @@ const config = {
             debug: false,
         },
     },
+    input: {
+        activePointers: 4,
+    },
 };
 
 new Phaser.Game(config);
