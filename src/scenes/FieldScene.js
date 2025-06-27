@@ -169,7 +169,7 @@ export class FieldScene extends Phaser.Scene {
         }
 
         // 점프 처리
-        if (this.spaceKey.isDown || this.isJumpPressed && this.jumpCooldown <= 0) {
+        if ((this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0) {
             this.player.anims.play('jump', true);
             this.partner.anims.play('jump2', true);
             this.jumpCooldown = this.jumpCooldownTime;  // 쿨타임 시작
