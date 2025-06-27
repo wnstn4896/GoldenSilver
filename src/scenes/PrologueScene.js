@@ -26,14 +26,16 @@ export class PrologueScene extends Phaser.Scene {
                 this.onNextDialogue();
             });
             // 플래시 효과
-            this.cameras.main.flash(1000, 0, 0, 0);
+            if (dialogue.flash === 'black')
+                this.cameras.main.flash(1000, 0, 0, 0);
         } else {
             this.endScene();
         }
     }
     
     endScene() {
-        window.location.reload();
+        this.bgm.stop();
+        this.scene.start('FieldScene');
     }
     
 }
