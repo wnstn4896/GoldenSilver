@@ -35,7 +35,7 @@ export class PrologueScene extends Phaser.Scene {
     
     endScene() {
         this.bgm.stop();
-        this.scene.start('FieldScene');
+        window.location.reload();
     }
     
 }
