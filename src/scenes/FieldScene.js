@@ -202,6 +202,8 @@ export class FieldScene extends Phaser.Scene {
         // 평타 공격
         if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0){
             this.attackCooldown = this.attackCooldownTime;
+            this.partner.anims.stop();
+            this.partner.setTexture('Aster_walk1');
             this.player.anims.play('attack', true);
         }
 
