@@ -4,15 +4,18 @@ export class FieldScene extends Phaser.Scene {
         this.player;
         this.cursors;
         this.spaceKey;
-        this.shiftKey;
+        this.zKey;
         this.jumpSpeed = -380;    // 점프 속도 (음수 값)
         this.gravity = 450;       // 중력 값
         this.jumpCooldown = 0;    // 점프 쿨타임 초기화 (초기값 0)
         this.jumpCooldownTime = 1750; // 쿨타임 시간 (밀리초)
+        this.attackCooldown = 0;
+        this.attackCooldownTime = 750;
 
         this.isLeftPressed = false;
         this.isRightPressed = false;
         this.isJumpPressed = false;
+        this.isAtkPressed = false;
     }
 
     create() {
@@ -24,6 +27,7 @@ export class FieldScene extends Phaser.Scene {
         const walkFrames2 = [];
         const jumpFrames = [];
         const jumpFrames2 = [];
+        const attackFrames = [];
         for (let i=1; i <= 6; i++){
             walkFrames.push({ key: 'Reed_walk' + i });
             walkFrames2.push({ key: 'Aster_walk' + i });
@@ -31,6 +35,8 @@ export class FieldScene extends Phaser.Scene {
         for (let i=1; i<=3; i++){
             jumpFrames.push({ key: 'Reed_jump' + i});
             jumpFrames2.push({ key: 'Aster_jump' + i});
+
+            attackFrames.push({ key: 'Reed_attack' + i});
         }
 
 
@@ -59,6 +65,12 @@ export class FieldScene extends Phaser.Scene {
             frameRate: 10,
             repeat: 0
         });
+        this.anims.create({
+            key: 'attack',
+            frames: attackFrames,
+            frameRate: 10,
+            repeat: 0
+        });
 
         // 기본 스프라이트 설정
         this.player = this.physics.add.sprite(150, 500, 'Reed_walk1');
@@ -77,54 +89,44 @@ export class FieldScene extends Phaser.Scene {
 
         if (isMobile){
             // 왼쪽 버튼
-            this.leftButton = this.add.text(100, 640, '←', {
-            fontSize: '80px',
-            color: '#FFD700', // 기본 금색
-            fontFamily: 'HeirofLightBold',
-            stroke: '#000000', // 검정색 외곽선
-            strokeThickness: 5, // 외곽선 두께
-        }).setOrigin(1.0, 0.5).setInteractive();
-            this.leftButton.setScale(0.7);
+            this.leftButton = this.add.tileSprite(140, 640, 210, 220, 'left_btn').setOrigin(1.0, 0.5).setInteractive();
+            this.leftButton.setScale(0.4);
             this.leftButton.on('pointerdown', () => this.isLeftPressed = true);
             this.leftButton.on('pointerup', () => this.isLeftPressed = false);
             this.leftButton.on('pointerout', () => this.isLeftPressed = false);
 
             // 오른쪽 버튼
-            this.rightButton = this.add.text(220, 640, '→', {
-            fontSize: '80px',
-            color: '#FFD700', // 기본 금색
-            fontFamily: 'HeirofLightBold',
-            stroke: '#000000', // 검정색 외곽선
-            strokeThickness: 5, // 외곽선 두께
-        }).setOrigin(1.0, 0.5).setInteractive();
-            this.rightButton.setScale(0.7);
+            this.rightButton = this.add.tileSprite(240, 640, 210, 220, 'right_btn').setOrigin(1.0, 0.5).setInteractive()
+            this.rightButton.setScale(0.4);
             this.rightButton.on('pointerdown', () => this.isRightPressed = true);
             this.rightButton.on('pointerup', () => this.isRightPressed = false);
             this.rightButton.on('pointerout', () => this.isRightPressed = false);
 
             // 점프 버튼
-            this.jumpButton = this.add.circle(1138, 640, 60, 0xffd700, 0.5).setInteractive(); // 터치 영역 확대
-            this.jumpButtonText = this.add.text(1180, 640, '점프', {
-                fontSize: '48px',
-                color: '#FFD700', // 기본 금색
-                fontFamily: 'HeirofLightBold',
-                stroke: '#000000', // 검정색 외곽선
-            }).setOrigin(1.0, 0.5).setInteractive();
-            this.jumpButtonText.on('pointerdown', () => this.isJumpPressed = true);
-            this.jumpButtonText.on('pointerup', () => this.isJumpPressed = false);
-            this.jumpButtonText.on('pointerout', () => this.isJumpPressed = false);
+            this.jumpButton = this.add.tileSprite(1050, 640, 210, 220, 'jump_btn').setOrigin(1.0, 0.5).setInteractive();
+            this.jumpButton.setScale(0.5);
+            this.jumpButton.on('pointerdown', () => this.isJumpPressed = true);
+            this.jumpButton.on('pointerup', () => this.isJumpPressed = false);
+            this.jumpButton.on('pointerout', () => this.isJumpPressed = false);
+
+            // 공격 버튼
+            this.atkButton = this.add.tileSprite(1200, 640, 210, 220, 'attack_btn').setOrigin(1.0, 0.5).setInteractive();
+            this.atkButton.setScale(0.4);
+            this.atkButton.on('pointerdown', () => this.isAtkPressed = true);
+            this.atkButton.on('pointerup', () => this.isAtkPressed = false);
+            this.atkButton.on('pointerout', () => this.isAtkPressed = false);
         }
 
         // 키보드 입력
         this.cursors = this.input.keyboard.createCursorKeys();
         this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+        this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
     }
 
     update(time, delta) {
         const isOnGround = this.player.body.onFloor();  // 점프 중 상태 판별
         // 이동 처리
-        if (this.cursors.right.isDown || this.isRightPressed) {
+        if ((this.cursors.right.isDown || this.isRightPressed) && this.attackCooldown <= 200) {
             this.background.tilePositionX += 3;
             this.player.setVelocityX(160);
             if (isOnGround && !this.player.anims.isPlaying) {
@@ -141,7 +143,7 @@ export class FieldScene extends Phaser.Scene {
                 duration: 100,
                 ease: 'Linear'
             });
-        } else if (this.cursors.left.isDown || this.isLeftPressed) {
+        } else if ((this.cursors.left.isDown || this.isLeftPressed) && this.attackCooldown <= 200) {
             this.background.tilePositionX -= 3;
             this.player.setVelocityX(-160);
             if (isOnGround && !this.player.anims.isPlaying) {
@@ -160,7 +162,7 @@ export class FieldScene extends Phaser.Scene {
             });
         } else {
             this.player.setVelocityX(0);
-            if (isOnGround && this.jumpCooldown <= 0) {
+            if (isOnGround && this.jumpCooldown <= 0 && this.attackCooldown <= 0) {
                 this.player.anims.stop();
                 this.partner.anims.stop();
                 this.player.setTexture('Reed_walk1');
@@ -186,9 +188,9 @@ export class FieldScene extends Phaser.Scene {
             this.partner.setVelocityY(this.player.y);
         }
 
-        // 쿨타임이 남아있다면 감소
+        // 점프 쿨타임 처리
         if (this.jumpCooldown > 0) {
-            this.jumpCooldown -= delta;  // delta는 프레임 당 시간 간격
+            this.jumpCooldown -= delta;
             this.tweens.add({
                 targets: this.partner,
                 y: this.player.y,
@@ -197,7 +199,15 @@ export class FieldScene extends Phaser.Scene {
             });
         }
 
-        if (this.shiftKey.isDown)
-            this.cameras.main.flash(1000, 0, 0, 0);
+        // 평타 공격
+        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0){
+            this.attackCooldown = this.attackCooldownTime;
+            this.player.anims.play('attack', true);
+        }
+
+        // 평타 쿨타임 처리
+        if (this.attackCooldown > 0) {
+            this.attackCooldown -= delta;
+        }
     }
 }
