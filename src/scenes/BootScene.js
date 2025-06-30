@@ -15,16 +15,22 @@ export class BootScene extends Phaser.Scene {
 
         this.load.image('testField', `${img}/testField.png`);
 
+        
+        // 모바일용 버튼 이미지 정의
+        this.load.image('left_btn', `${img}/left_button.png`);
+        this.load.image('right_btn', `${img}/right_button.png`);
+        this.load.image('jump_btn', `${img}/jump_button.png`);
+        this.load.image('attack_btn', `${img}/attack_button.png`);
 
-        // 플레이어 캐릭터 - 걷는 동작 - 6 프레임 로드
+        // 애니메이션 프레임 정의
         for (let i=1; i <= 6; i++) {
             this.load.image('Reed_walk' + i, `${img}/Reed_walk` + i + '.png');
             this.load.image('Aster_walk' + i, `${img}/Aster_walk` + i + '.png');
         }
-        // 플레이어 캐릭터 - 점프 동작 - 3 프레임 로드
         for (let i=1; i<=3; i++){
             this.load.image('Reed_jump' + i, `${img}/Reed_jump` + i + '.png');
             this.load.image('Aster_jump' + i, `${img}/Aster_jump` + i + '.png');
+            this.load.image('Reed_attack' + i, `${img}/Reed_attack` + i + '.png');
         }
 
         // 대사 메시지 JSON 로드
