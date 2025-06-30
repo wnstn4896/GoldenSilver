@@ -87,7 +87,7 @@ export class FieldScene extends Phaser.Scene {
          // 환경 감지: PC인지 모바일인지 확인
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-        if (isMobile){
+        if (!isMobile){
             // 왼쪽 버튼
             this.leftButton = this.add.tileSprite(140, 640, 210, 220, 'left_btn').setOrigin(1.0, 0.5).setInteractive();
             this.leftButton.setScale(0.4);
@@ -96,7 +96,7 @@ export class FieldScene extends Phaser.Scene {
             this.leftButton.on('pointerout', () => this.isLeftPressed = false);
 
             // 오른쪽 버튼
-            this.rightButton = this.add.tileSprite(240, 640, 210, 220, 'right_btn').setOrigin(1.0, 0.5).setInteractive()
+            this.rightButton = this.add.tileSprite(240, 640, 210, 220, 'right_btn').setOrigin(1.0, 0.5).setInteractive();
             this.rightButton.setScale(0.4);
             this.rightButton.on('pointerdown', () => this.isRightPressed = true);
             this.rightButton.on('pointerup', () => this.isRightPressed = false);
