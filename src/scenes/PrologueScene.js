@@ -28,6 +28,9 @@ export class PrologueScene extends Phaser.Scene {
             // 플래시 효과
             if (dialogue.flash === 'black')
                 this.cameras.main.flash(1000, 0, 0, 0);
+
+            if (this.currentIndex === 14)
+                this.bgm.stop();
         } else {
             this.endScene();
         }
