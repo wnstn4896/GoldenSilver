@@ -93,7 +93,7 @@ export class MessageModule {
             this.scene.cameras.main.setBackgroundColor('rgba(0,0,0,0)');
         } else {
             background.setVisible(false);
-            this.scene.cameras.main.setBackgroundColor('#000000');
+            // this.scene.cameras.main.setBackgroundColor('#000000');
         }
 
         // 대화 상자 및 텍스트 업데이트
@@ -109,6 +109,9 @@ export class MessageModule {
             nameBox.setVisible(false);
             nameText.setVisible(false);
         }
+
+        this.uiElements.dialogBox.clear();
+        this.uiElements.nameBox.clear();
         
         // 캐릭터 별 대화 스타일 지정
         switch (dialogue.name) {
