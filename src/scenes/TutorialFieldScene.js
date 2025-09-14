@@ -288,7 +288,6 @@ export class TutorialFieldScene extends Phaser.Scene {
         // 맵 스크롤 
         if (this.player.x > 1300){
             this.mapCount++;
-            this.cameras.main.flash(300, 0, 0, 0);
             this.player.setPosition(-80, 500);
             this.partner.setVisible(false);
             this.time.delayedCall(300, () => {
