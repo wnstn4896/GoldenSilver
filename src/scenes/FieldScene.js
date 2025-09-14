@@ -23,7 +23,7 @@ export class FieldScene extends Phaser.Scene {
     }
 
     create() {
-        this.background = this.add.tileSprite(640, 360, 1280, 720, 'testField');
+        this.background = this.add.tileSprite(640, 360, 1280, 720, 'TutorialField');
         this.physics.world.setBounds(-70, 0, 1430, 550); // 월드 경계 설정
 
         // 스프라이트 시트 없이 개별 이미지를 애니메이션으로 구성
