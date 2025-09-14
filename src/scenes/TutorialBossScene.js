@@ -215,8 +215,7 @@ export class TutorialBossScene extends Phaser.Scene {
         const isOnGround = this.player.body.onFloor();  // 점프 중 상태 판별
         // 이동 처리
         if ((this.cursors.right.isDown || this.isRightPressed) && this.attackCooldown <= 200 && !this.isStunned) {
-            this.background.tilePositionX += 3;
-            this.player.setVelocityX(160);
+            this.player.setVelocityX(360);
             if (isOnGround && !this.player.anims.isPlaying) {
                 this.player.anims.play('walk', true);
                 this.partner.anims.play('walk2', true);
@@ -367,16 +366,5 @@ export class TutorialBossScene extends Phaser.Scene {
         if (this.attackCooldown > 0) {
             this.attackCooldown -= delta;
         }
-
-        /* 맵 스크롤
-        if (this.player.x > 1300){
-            this.cameras.main.flash(300, 0, 0, 0);
-            this.player.setPosition(-80, 500);
-            this.partner.setVisible(false);
-            this.time.delayedCall(300, () => {
-                this.partner.setVisible(true);
-            });
-        }
-        */
     }
 }

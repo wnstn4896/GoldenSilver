@@ -296,7 +296,7 @@ export class TutorialFieldScene extends Phaser.Scene {
             });
         }
 
-        if (this.mapCount >= 3)
+        if (this.mapCount >= 2)
             this.scene.start('TutorialBossScene');
     }
 }
