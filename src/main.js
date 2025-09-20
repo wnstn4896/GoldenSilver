@@ -4,9 +4,7 @@ import { PrologueScene } from './scenes/PrologueScene.js';
 import { TutorialFieldScene } from './scenes/TutorialFieldScene.js';
 import { TutorialBossScene } from './scenes/TutorialBossScene.js';
 
-document.oncontextmenu = function(e){
-    return false;
-}
+document.oncontextmenu = function(e){ return false; }
 
 const config = {
     type: Phaser.AUTO,

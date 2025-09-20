@@ -148,7 +148,7 @@ export class TutorialFieldScene extends Phaser.Scene {
         // 이동 처리
         if ((this.cursors.right.isDown || this.isRightPressed) && this.attackCooldown <= 200 && !this.isStunned) {
             this.background.tilePositionX += 3;
-            this.player.setVelocityX(160);
+            this.player.setVelocityX(200);
             if (isOnGround && !this.player.anims.isPlaying) {
                 this.player.anims.play('walk', true);
                 this.partner.anims.play('walk2', true);
