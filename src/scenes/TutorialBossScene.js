@@ -144,7 +144,7 @@ export class TutorialBossScene extends Phaser.Scene {
 
         // 적 생성
         this.enemies = this.physics.add.group({
-            key: 'Tuto_walk1',
+            key: 'Tuto_standing',
             repeat: 0, // 적 1개만 생성
             setXY: { x: 900, y: 550 },
         });
