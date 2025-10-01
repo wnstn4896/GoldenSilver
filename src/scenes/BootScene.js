@@ -22,6 +22,7 @@ export class BootScene extends Phaser.Scene {
         this.load.image('TutorialBossField', `${img}/TutorialBossField.png`);
 
         this.load.image('Tuto_standing', `${img}/Tuto_standing.png`);
+        this.load.image('Tuto_defeated', `${img}/Tuto_defeated.png`);
 
 
         this.load.image('attack_effect', `${img}/attack_effect.png`);

@@ -200,11 +200,11 @@ export class TutorialBossScene extends Phaser.Scene {
             this.updateEnemyHPBar(enemy);
             this.sound.add('Tuto_damaged').setVolume(0.6).play();
 
-            // 적 체력 0이면 사망 처리
+            // 적 체력 0이면 처치
             if (enemy.hp <= 0) {
                 this.cameras.main.flash(300, 255, 255, 255);
                 enemy.healthBar.destroy(); // 체력바 제거
-                enemy.destroy();           // 적 제거
+                enemy.setTexture('Tuto_defeated');
             }
 
             // 공격 이펙트 제거
