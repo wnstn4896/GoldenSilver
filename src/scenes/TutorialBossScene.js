@@ -13,8 +13,8 @@ export class TutorialBossScene extends Phaser.Scene {
         this.attackCooldown = 0;
         this.attackCooldownTime = 750;
         this.isStunned = false;
-        this.atkDamage = 0; 
-        
+        this.atkDamage = 0;
+        this.stageClear = false;
 
         this.isLeftPressed = false;
         this.isRightPressed = false;
@@ -146,7 +146,7 @@ export class TutorialBossScene extends Phaser.Scene {
         this.enemies = this.physics.add.group({
             key: 'Tuto_standing',
             repeat: 0, // 적 1개만 생성
-            setXY: { x: 900, y: 550 },
+            setXY: { x: 800, y: 550 },
         });
         this.enemies.children.iterate((enemy) => {
             enemy.setScale(0.29);
@@ -202,9 +202,16 @@ export class TutorialBossScene extends Phaser.Scene {
 
             // 적 체력 0이면 처치
             if (enemy.hp <= 0) {
+                const noticeText = this.add.text(950, 400, 'Press Jump', {
+                fontSize: '36px',
+                color: 'gray', // 기본 금색
+                fontFamily: 'HeirofLightBold',
+            }).setOrigin(0.5, 0.5).setInteractive();
+                
                 this.cameras.main.flash(300, 255, 255, 255);
                 enemy.healthBar.destroy(); // 체력바 제거
                 enemy.setTexture('Tuto_defeated');
+                this.stageClear = true;
             }
 
             // 공격 이펙트 제거
@@ -365,6 +372,13 @@ export class TutorialBossScene extends Phaser.Scene {
         // 평타 쿨타임 처리
         if (this.attackCooldown > 0) {
             this.attackCooldown -= delta;
+        }
+
+        // 문 쪽에서 점프 시 다음 씬 이동
+        if ((this.player.x < 1000 && this.player.x > 900) && (this.spaceKey.isDown || this.isJumpPressed) && this.stageClear){
+            this.cameras.main.flash(300, 0, 0, 0);
+            alert('미완성');
+            this.scene.start('StageSelectScene');
         }
     }
 }
