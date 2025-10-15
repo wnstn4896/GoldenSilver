@@ -81,7 +81,7 @@ export class TutorialFieldScene extends Phaser.Scene {
         this.anims.create({
             key: 'attack2',
             frames: attackFrames2,
-            frameRate: 10,
+            frameRate: 15,
             repeat: 0
         });
 
