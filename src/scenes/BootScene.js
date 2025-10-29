@@ -28,7 +28,8 @@ export class BootScene extends Phaser.Scene {
 
         this.load.image('attack_effect', `${img}/attack_effect.png`);
 
-        
+        this.load.image('barrel', `${img}/barrel.png`);
+
         // 모바일용 버튼 이미지 정의
         this.load.image('left_btn', `${img}/left_button.png`);
         this.load.image('right_btn', `${img}/right_button.png`);
@@ -50,6 +51,7 @@ export class BootScene extends Phaser.Scene {
 
         // 대사 메시지 JSON 로드
         this.load.json('PrologueDialogues', `${msg}/Prologue.json`);
+        this.load.json('TutorialDialogues', `${msg}/Tutorial.json`);
 
         // 사운드 로드
         this.load.audio('prologueBGM', [`${sound}/prologue.mp3`]);

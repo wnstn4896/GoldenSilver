@@ -1,3 +1,5 @@
+import { MessageModule } from './MessageModule.js';
+
 export class TutorialBossScene extends Phaser.Scene {
     constructor() {
         super({ key: 'TutorialBossScene' });
@@ -20,6 +22,12 @@ export class TutorialBossScene extends Phaser.Scene {
         this.isRightPressed = false;
         this.isJumpPressed = false;
         this.isAtkPressed = false;
+
+        // 대사 출력 관련
+        this.dialogues = [];
+        this.currentIndex = 8;
+        this.MessageModule;
+        this.isMessages;
     }
 
     create() {
@@ -46,7 +54,6 @@ export class TutorialBossScene extends Phaser.Scene {
             attackFrames.push({ key: 'Reed_attack' + i});
             attackFrames2.push({ key: 'Aster_attack' + i});
         }
-
 
         // 애니메이션 정의
         this.anims.create({
@@ -163,6 +170,24 @@ export class TutorialBossScene extends Phaser.Scene {
             this.updateEnemyHPBar(enemy);
         });
 
+        // 대사 출력 관련 모듈 정의
+        this.MessageModule = new MessageModule(this);
+        this.MessageModule.createUI();
+        this.MessageModule.hideUI();
+
+        // 대화창 조작 안내 텍스트
+        this.uiElements = {};
+
+        this.uiElements.controlsText = this.add.text(910, 620, '(Press [SPACE] OR Click)', {
+            fontSize: '16px',
+            fontFamily: 'HeirofLightRegular',
+            color: '#ffffff',
+            padding: { top: 2, bottom: 2 },
+        });
+        this.uiElements.controlsText.setVisible(false);
+        
+        this.dialogues = this.cache.json.get('TutorialDialogues');
+
 
         // 키보드 입력
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -172,6 +197,42 @@ export class TutorialBossScene extends Phaser.Scene {
 
         // 공격 판정 충돌 처리
         this.physics.add.overlap(this.playerAttacks, this.enemies, this.handlePlayerAttackHit, null, this);
+    }
+
+    // 대사 출력 관련 함수
+    showDialogue() {
+        this.physics.pause(); // 물리엔진 정지
+        this.uiElements.controlsText.setVisible(true);
+        this.isMessages = true;
+
+        const dialogue = this.dialogues[this.currentIndex];
+
+        if (this.currentIndex < this.dialogues.length && !dialogue.stop) {
+            this.MessageModule.updateDialogue(dialogue, () => {
+                this.currentIndex++;
+                this.showDialogue();
+            });
+        }
+        else if (this.currentIndex < this.dialogues.length && dialogue.stop) {
+            this.currentIndex++;
+            this.endDialogue();
+        }
+        else {
+            this.endDialogue();
+        }
+    }
+    endDialogue() {
+        this.isStunned = true;
+
+        this.uiElements.controlsText.setVisible(false);
+        this.MessageModule.hideUI(); // 대사 UI 숨기기
+        this.physics.resume(); // 물리엔진 재가동
+        this.isMessages = false;
+
+        // 점프 동작 겹침 방지
+        this.time.delayedCall(100, () => {
+            this.isStunned = false;
+        });
     }
 
     updateEnemyHPBar(enemy){
@@ -212,6 +273,8 @@ export class TutorialBossScene extends Phaser.Scene {
                 enemy.healthBar.destroy(); // 체력바 제거
                 enemy.setTexture('Tuto_defeated');
                 this.stageClear = true;
+
+                this.showDialogue();
             }
 
             // 공격 이펙트 제거
@@ -221,7 +284,7 @@ export class TutorialBossScene extends Phaser.Scene {
     update(time, delta) {
         const isOnGround = this.player.body.onFloor();  // 점프 중 상태 판별
         // 이동 처리
-        if ((this.cursors.right.isDown || this.isRightPressed) && this.attackCooldown <= 200 && !this.isStunned) {
+        if ((this.cursors.right.isDown || this.isRightPressed) && this.attackCooldown <= 200 && !this.isStunned && !this.isMessages) {
             this.player.setVelocityX(360);
             if (isOnGround && !this.player.anims.isPlaying) {
                 this.player.anims.play('walk', true);
@@ -237,7 +300,7 @@ export class TutorialBossScene extends Phaser.Scene {
                 duration: 100,
                 ease: 'Linear'
             });
-        } else if ((this.cursors.left.isDown || this.isLeftPressed) && this.attackCooldown <= 200 && !this.isStunned) {
+        } else if ((this.cursors.left.isDown || this.isLeftPressed) && this.attackCooldown <= 200 && !this.isStunned && !this.isMessages) {
             this.player.setVelocityX(-360);
             if (isOnGround && !this.player.anims.isPlaying) {
                 this.player.anims.play('walk', true);
@@ -279,7 +342,7 @@ export class TutorialBossScene extends Phaser.Scene {
         });
 
         // 점프 처리
-        if ((this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0 && !this.isStunned) {
+        if (isOnGround && (this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0 && !this.isStunned && !this.isMessages) {
             this.sound.add('sfx_jump').setVolume(0.6).play();
             this.sound.add('sfx_jump2').setVolume(0.2).play();
             this.player.anims.play('jump', true);
@@ -304,7 +367,7 @@ export class TutorialBossScene extends Phaser.Scene {
         }
 
         // 평타 공격
-        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0 && !this.isStunned){
+        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0 && !this.isStunned && !this.isMessages){
             this.attackCooldown = this.attackCooldownTime;
             this.partner.anims.stop();
             // 내려찍기
@@ -373,6 +436,10 @@ export class TutorialBossScene extends Phaser.Scene {
         if (this.attackCooldown > 0) {
             this.attackCooldown -= delta;
         }
+
+        // 대사 출력
+        if (((isOnGround && this.currentIndex <= 8) || this.player.x >= 200) && this.currentIndex <= 24)
+            this.showDialogue();
 
         // 문 쪽에서 점프 시 다음 씬 이동
         if ((this.player.x < 1000 && this.player.x > 900) && (this.spaceKey.isDown || this.isJumpPressed) && this.stageClear){
