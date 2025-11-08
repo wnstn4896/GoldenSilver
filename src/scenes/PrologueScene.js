@@ -14,7 +14,7 @@ export class PrologueScene extends Phaser.Scene {
         this.onNextDialogue();
 
         this.bgm = this.sound.add('prologueBGM', { loop: true });
-        this.bgm.play();
+        this.bgm.setVolume(0.4).play();
     }
 
     onNextDialogue() {
