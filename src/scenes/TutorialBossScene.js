@@ -197,6 +197,9 @@ export class TutorialBossScene extends Phaser.Scene {
 
         // 공격 판정 충돌 처리
         this.physics.add.overlap(this.playerAttacks, this.enemies, this.handlePlayerAttackHit, null, this);
+
+        this.bgm = this.sound.add('Tuto_Battle', { loop: true });
+        this.bgm.setVolume(0.4).play();
     }
 
     // 대사 출력 관련 함수
@@ -443,6 +446,7 @@ export class TutorialBossScene extends Phaser.Scene {
 
         // 문 쪽에서 점프 시 다음 씬 이동
         if ((this.player.x < 1000 && this.player.x > 900) && (this.spaceKey.isDown || this.isJumpPressed) && this.stageClear){
+            this.bgm.stop();
             this.cameras.main.flash(300, 0, 0, 0);
             alert('미완성');
             this.scene.start('StageSelectScene');

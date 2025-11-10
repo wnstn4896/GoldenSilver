@@ -16,7 +16,7 @@ export class BootScene extends Phaser.Scene {
         for (let i = 1; i <= 3; i++)
             this.load.image('Reeds_Room' + i, `${img}/Reeds_Room` + i + '.png');
 
-        this.load.image('testField', `${img}/testField.png`);
+        this.load.image('Forest', `${img}/Forest.png`);
 
         this.load.image('TutorialField', `${img}/TutorialField.png`);
         this.load.image('TutorialBossField', `${img}/TutorialBossField.png`);
@@ -27,6 +27,7 @@ export class BootScene extends Phaser.Scene {
 
 
         this.load.image('attack_effect', `${img}/attack_effect.png`);
+        this.load.image('arrow', `${img}/arrow.png`);
 
         this.load.image('barrel', `${img}/barrel.png`);
 
@@ -37,12 +38,13 @@ export class BootScene extends Phaser.Scene {
         this.load.image('attack_btn', `${img}/attack_button.png`);
 
         // 애니메이션 프레임 정의
-        for (let i=1; i <= 6; i++) {
+        for (let i = 1; i <= 6; i++) {
             this.load.image('Reed_walk' + i, `${img}/Reed_walk` + i + '.png');
             this.load.image('Aster_walk' + i, `${img}/Aster_walk` + i + '.png');
             this.load.image('Tuto_walk' + i, `${img}/Tuto_walk` + i + '.png');
+            this.load.image('Reed_Horse' + i, `${img}/Reed_Horse` + i + '.png');
         }
-        for (let i=1; i<=3; i++){
+        for (let i = 1; i <= 3; i++) {
             this.load.image('Reed_jump' + i, `${img}/Reed_jump` + i + '.png');
             this.load.image('Aster_jump' + i, `${img}/Aster_jump` + i + '.png');
             this.load.image('Reed_attack' + i, `${img}/Reed_attack` + i + '.png');
@@ -55,6 +57,9 @@ export class BootScene extends Phaser.Scene {
 
         // 사운드 로드
         this.load.audio('prologueBGM', [`${sound}/prologue.mp3`]);
+        this.load.audio('Reeds_RoomBGM', [`${sound}/Reeds_RoomBGM.mp3`]);
+        this.load.audio('castle', [`${sound}/castle.mp3`]);
+        this.load.audio('Tuto_Battle', [`${sound}/Tuto_Battle.mp3`]);
 
         // 효과음
         this.load.audio('sfx_attack', [`${sound}/sfx_attack.wav`]);
@@ -62,6 +67,7 @@ export class BootScene extends Phaser.Scene {
         this.load.audio('sfx_jump2', [`${sound}/sfx_jump2.mp3`]);
         this.load.audio('sfx_jumpattack', [`${sound}/sfx_jumpattack.ogg`]);
         this.load.audio('Tuto_damaged', [`${sound}/Tuto_damaged.wav`]);
+        this.load.audio('sfx_crossbow', [`${sound}/sfx_crossbow.mp3`]);
     }
 
     create() {

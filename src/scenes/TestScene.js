@@ -1,8 +1,8 @@
 import { MessageModule } from './MessageModule.js';
 
-export class TutorialFieldScene extends Phaser.Scene {
+export class TestScene extends Phaser.Scene {
     constructor() {
-        super({ key: 'TutorialFieldScene' });
+        super({ key: 'TestScene' });
         this.player;
         this.cursors;
         this.spaceKey;
@@ -15,43 +15,34 @@ export class TutorialFieldScene extends Phaser.Scene {
         this.attackCooldown = 0;
         this.attackCooldownTime = 750;
         this.isStunned = false;
-        this.atkDamage = 0; 
+        this.atkDamage = 0;
 
         this.isLeftPressed = false;
         this.isRightPressed = false;
         this.isJumpPressed = false;
         this.isAtkPressed = false;
 
-        this.mapCount = 0;
-
         // 대사 출력 관련
         this.dialogues = [];
         this.currentIndex = 0;
         this.MessageModule;
-        this.isMessages; 
+        this.isMessages;
     }
 
     create() {
-        this.background = this.add.tileSprite(640, 360, 1280, 720, 'TutorialField');
+        this.background = this.add.tileSprite(640, 360, 1280, 720, 'Forest');
         this.physics.world.setBounds(-70, 0, 1430, 550); // 월드 경계 설정
 
         // 스프라이트 시트 없이 개별 이미지를 애니메이션으로 구성
         const walkFrames = [];
-        const walkFrames2 = [];
         const jumpFrames = [];
-        const jumpFrames2 = [];
         const attackFrames = [];
-        const attackFrames2 = [];
-        for (let i=1; i <= 6; i++){
+        for (let i = 1; i <= 6; i++) {
             walkFrames.push({ key: 'Reed_walk' + i });
-            walkFrames2.push({ key: 'Aster_walk' + i });
         }
-        for (let i=1; i<=3; i++){
-            jumpFrames.push({ key: 'Reed_jump' + i});
-            jumpFrames2.push({ key: 'Aster_jump' + i});
-
-            attackFrames.push({ key: 'Reed_attack' + i});
-            attackFrames2.push({ key: 'Aster_attack' + i});
+        for (let i = 1; i <= 3; i++) {
+            jumpFrames.push({ key: 'Reed_jump' + i });
+            attackFrames.push({ key: 'Reed_attack' + i });
         }
 
         // 애니메이션 정의
@@ -62,20 +53,8 @@ export class TutorialFieldScene extends Phaser.Scene {
             repeat: -1
         });
         this.anims.create({
-            key: 'walk2',
-            frames: walkFrames2,
-            frameRate: 12,
-            repeat: -1
-        });
-        this.anims.create({
             key: 'jump',
             frames: jumpFrames,
-            frameRate: 10,
-            repeat: 0
-        });
-        this.anims.create({
-            key: 'jump2',
-            frames: jumpFrames2,
             frameRate: 10,
             repeat: 0
         });
@@ -85,12 +64,18 @@ export class TutorialFieldScene extends Phaser.Scene {
             frameRate: 10,
             repeat: 0
         });
+
+        const horseFrames = [];
+        for (let i = 1; i <= 6; i++) {
+            horseFrames.push({ key: 'Reed_Horse' + i });
+        }
         this.anims.create({
-            key: 'attack2',
-            frames: attackFrames2,
-            frameRate: 15,
-            repeat: 0
+            key: 'horse',
+            frames: horseFrames,
+            frameRate: 12,
+            repeat: -1
         });
+
 
         // 기본 스프라이트 설정
         this.player = this.physics.add.sprite(150, 500, 'Reed_walk1');
@@ -99,16 +84,10 @@ export class TutorialFieldScene extends Phaser.Scene {
         this.player.setFlipX(true);
         this.player.setGravityY(this.gravity);  // 중력 설정
 
-        this.partner = this.physics.add.sprite(50, 550, 'Aster_walk1');
-        this.partner.setCollideWorldBounds(true);
-        this.partner.setScale(0.24);
-        this.partner.setFlipX(true);
-        this.partner.setGravityY(this.gravity);  // 중력 설정
-
-         // 모바일 환경 감지
+        // 모바일 환경 감지
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-        if (isMobile){
+        if (isMobile) {
             // 왼쪽 버튼
             this.leftButton = this.add.tileSprite(140, 640, 210, 220, 'left_btn').setOrigin(1.0, 0.5).setInteractive();
             this.leftButton.setScale(0.4);
@@ -150,30 +129,6 @@ export class TutorialFieldScene extends Phaser.Scene {
         // 공격 판정 충돌 처리
         this.physics.add.overlap(this.playerAttacks, this.enemies, this.handlePlayerAttackHit, null, this);
 
-
-        // 장애물 생성
-        this.enemies = this.physics.add.group({
-            key: 'barrel',
-            repeat: 0, // 적 1개만 생성
-            setXY: { x: 800, y: 550 },
-        });
-        this.enemies.children.iterate((enemy) => {
-            enemy.setScale(1);
-            enemy.setCollideWorldBounds(true); // 월드 경계 밖으로 못 나가게 설정
-            enemy.setGravityY(this.gravity);
-            enemy.setImmovable(true);
-            enemy.setSize(enemy.width * 0.8, enemy.height * 0.9); // 충돌 박스를 살짝 줄임
-            enemy.setOffset(enemy.width * 0.1, enemy.height * 0.1); // 위치 조정
-
-            enemy.disableBody(true, true);
-        });
-        // 충돌 처리
-        this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
-            if (player.body.touching.down && enemy.body.touching.up) {
-                player.setVelocityY(50);
-            }
-        });
-
         // 대사 출력 관련 모듈 정의
         this.MessageModule = new MessageModule(this);
         this.MessageModule.createUI();
@@ -189,11 +144,8 @@ export class TutorialFieldScene extends Phaser.Scene {
             padding: { top: 2, bottom: 2 },
         });
         this.uiElements.controlsText.setVisible(false);
-        
-        this.dialogues = this.cache.json.get('TutorialDialogues');
 
-        this.bgm = this.sound.add('castle', { loop: true });
-        this.bgm.setVolume(0.4).play();
+        this.dialogues = this.cache.json.get('TutorialDialogues');
     }
 
     // 대사 출력 관련 함수
@@ -233,11 +185,50 @@ export class TutorialFieldScene extends Phaser.Scene {
     }
 
     update(time, delta) {
-        const isOnGround = this.player.body.onFloor();  // 점프 중 상태 판별
+        this.player.setScale(0.5);
+        this.background.tilePositionX += 10;
+        this.player.anims.play('horse', true);
 
+        // 공격(석궁) 처리
+        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0) {
+            this.attackCooldown = this.attackCooldownTime;
+            this.sound.add('sfx_crossbow').setVolume(0.5).play();
+
+            const attackEffect = this.playerAttacks.create(this.player.x + 70, this.player.y - 30, 'arrow');
+            attackEffect.setFlipX(!this.player.flipX);
+            attackEffect.setScale(2);
+            attackEffect.setVelocityX(900);
+        }
+
+        if (this.attackCooldown > 0) {
+            this.attackCooldown -= delta;
+        }
+
+        // 점프(승마 상태) 처리
+        if ((this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0) {
+            this.sound.add('sfx_jump').setVolume(0.6).play();
+            this.jumpCooldown = this.jumpCooldownTime;  // 쿨타임 시작
+            this.time.delayedCall(100, () => {
+                this.player.setVelocityY(this.jumpHeight);  // 점프 높이 설정
+            });
+        }
+    
+        if (!this.player.body.onFloor()) {
+            this.player.anims.stop();
+        }
+    
+        // 점프 쿨타임 처리
+        if (this.jumpCooldown > 0) {
+            this.jumpCooldown -= delta;
+        }
+
+        /**
+    
+        const isOnGround = this.player.body.onFloor();  // 점프 중 상태 판별
+    
         // 이동 처리
         if ((this.cursors.right.isDown || this.isRightPressed) && this.attackCooldown <= 200 && !this.isStunned && !this.isMessages) {
-            if (this.mapCount < 1){
+            if (this.mapCount < 1) {
                 this.background.tilePositionX += 3;
                 this.player.setVelocityX(200);
             } else if (this.mapCount >= 1) {
@@ -245,121 +236,81 @@ export class TutorialFieldScene extends Phaser.Scene {
             }
             if (isOnGround && !this.player.anims.isPlaying) {
                 this.player.anims.play('walk', true);
-                this.partner.anims.play('walk2', true);
             }
             this.player.setFlipX(true);
-            this.partner.setFlipX(true);
-
-            this.tweens.add({
-                targets: this.partner,
-                x: this.player.x - 70,
-                y: this.player.y,
-                duration: 100,
-                ease: 'Linear'
-            });
         } else if ((this.cursors.left.isDown || this.isLeftPressed) && this.attackCooldown <= 200 && !this.isStunned && !this.isMessages) {
             this.player.setVelocityX(-360);
             if (isOnGround && !this.player.anims.isPlaying) {
                 this.player.anims.play('walk', true);
-                this.partner.anims.play('walk2', true);
             }
             this.player.setFlipX(false);
-            this.partner.setFlipX(false);
-
-            this.tweens.add({
-                targets: this.partner,
-                x: this.player.x + 70,
-                y: this.player.y,
-                duration: 50,
-                ease: 'Linear'
-            });
         } else {
             this.player.setVelocityX(0);
             if (isOnGround && this.jumpCooldown <= 0 && this.attackCooldown <= 0 && !this.isStunned) {
                 this.player.anims.stop();
-                this.partner.anims.stop();
                 this.player.setTexture('Reed_walk1');
-                this.partner.setTexture('Aster_walk1');
-            }       
+            }
         }
-
+    
         // 점프 처리
-        if (isOnGround && (this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0 && !this.isStunned  && !this.isMessages) {
+        if (isOnGround && (this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0 && !this.isStunned && !this.isMessages) {
             this.sound.add('sfx_jump').setVolume(0.6).play();
             this.sound.add('sfx_jump2').setVolume(0.2).play();
             this.player.anims.play('jump', true);
-            this.partner.anims.play('jump2', true);
             this.jumpCooldown = this.jumpCooldownTime;  // 쿨타임 시작
             this.time.delayedCall(100, () => {
                 this.player.setVelocityY(this.jumpHeight);  // 점프 높이 설정
-                this.partner.setVelocityY(this.jumpHeight);  // 점프 높이 설정
             });
         }
-
-        if (!isOnGround && this.jumpCooldown <= 120 && !this.isStunned){
+    
+        if (!isOnGround && this.jumpCooldown <= 120 && !this.isStunned) {
             this.player.anims.stop();
-            this.partner.anims.stop();
             this.player.setTexture('Reed_jump3');
-            this.partner.setTexture('Aster_jump3');
         }
-
+    
         // 점프 쿨타임 처리
         if (this.jumpCooldown > 0) {
             this.jumpCooldown -= delta;
         }
-
+    
         // 평타 공격
-        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0 && !this.isStunned && !this.isMessages){
+        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0 && !this.isStunned && !this.isMessages) {
             this.attackCooldown = this.attackCooldownTime;
-            this.partner.anims.stop();
             // 내려찍기
-            if (!isOnGround){
+            if (!isOnGround) {
                 this.isStunned = true;
                 this.player.anims.stop();
-                this.partner.setFlipX(!this.player.flipX);
-                
+    
                 this.player.setVelocityY(800);
-                this.partner.setVelocityY(800);
                 this.sound.add('sfx_attack').setVolume(0.5).play();
-
+    
                 this.time.delayedCall(250, () => {
                     this.atkDamage = 50;
-                    this.partner.setScale(0.26);
-                    this.partner.anims.play('attack2', true);
-                    this.partner.setY(600);
-
+    
                     const attackEffect = this.playerAttacks.create(this.player.flipX ? this.player.x + 40 : this.player.x - 40, this.player.y, 'attack_effect');
-                    const attackEffect2 =  this.playerAttacks.create(this.partner.flipX ? this.partner.x + 40 : this.partner.x - 40, this.player.y, 'attack_effect');
                     attackEffect.setFlipX(!this.player.flipX);
                     attackEffect.setScale(5.5);
-                    attackEffect2.setFlipX(!this.partner.flipX);
-                    attackEffect2.setScale(5.5);
-                    if (this.player.flipX){
+                    if (this.player.flipX) {
                         attackEffect.setVelocityX(60);
-                        attackEffect2.setVelocityX(-80);
                     }
-                    else{
+                    else {
                         attackEffect.setVelocityX(-60);
-                        attackEffect2.setVelocityX(80);
                     }
                     this.time.delayedCall(500, () => {
                         this.playerAttacks.clear(true);
                     });
-
+    
                     this.sound.add('sfx_jumpattack').setVolume(0.7).play();
                 });
-
+    
                 this.time.delayedCall(1000, () => {
                     this.atkDamage = 0;
-                    this.partner.anims.stop();
-                    this.partner.setTexture('Aster_jump2');
-                    this.partner.setScale(0.24);
                     this.isStunned = false;
                 });
             } else {
                 this.atkDamage = 25;
                 this.sound.add('sfx_attack').setVolume(0.5).play();
-
+    
                 const attackEffect = this.playerAttacks.create(this.player.flipX ? this.player.x + 40 : this.player.x - 40, this.player.y, 'attack_effect');
                 attackEffect.setFlipX(!this.player.flipX);
                 attackEffect.setScale(4.5);
@@ -378,34 +329,6 @@ export class TutorialFieldScene extends Phaser.Scene {
         if (this.attackCooldown > 0) {
             this.attackCooldown -= delta;
         }
-
-        // 맵 스크롤 
-        if (this.player.x > 1300){
-            this.mapCount++;
-            this.player.setPosition(-80, 500);
-            this.partner.setVisible(false);
-            this.time.delayedCall(300, () => {
-                this.partner.setVisible(true);
-            });
-        }
-
-        // 대사 출력
-        if ((isOnGround && this.currentIndex < 2) || (this.mapCount >= 1 && this.player.x >= 500))
-            this.showDialogue();
-
-        if (this.mapCount >= 1) {
-            this.enemies.children.iterate(enemy => {
-                enemy.enableBody(true, enemy.x, enemy.y, true, true);
-            });
-        }
-
-        if (this.mapCount >= 2){
-            this.bgm.stop();
-            this.scene.start('TutorialBossScene');
-        }
-
-        // 마지막 대사 출력 오류 방지
-        if (this.currentIndex >= 8)
-            this.currentIndex = this.dialogues.length;
+        */
     }
 }

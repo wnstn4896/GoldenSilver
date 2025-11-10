@@ -29,8 +29,26 @@ export class PrologueScene extends Phaser.Scene {
             if (dialogue.flash === 'black')
                 this.cameras.main.flash(1000, 0, 0, 0);
 
-            if (this.currentIndex === 14)
-                this.bgm.stop();
+            if (this.currentIndex === 14){
+                this.tweens.add({
+                    targets: this.bgm,
+                    volume: 0,
+                    duration: 1000,
+                    onComplete: () => {
+                        this.bgm.stop();
+
+                        this.bgm = this.sound.add('Reeds_RoomBGM', { loop: true });
+                        this.bgm.setVolume(0.4).play();
+
+                        this.tweens.add({
+                            targets: this.bgm,
+                            volume: 0.4,
+                            duration: 500
+                        });
+                    }
+                });
+
+            }
         } else {
             this.endScene();
         }
