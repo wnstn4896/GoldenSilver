@@ -60,6 +60,7 @@ export class BootScene extends Phaser.Scene {
         this.load.audio('Reeds_RoomBGM', [`${sound}/Reeds_RoomBGM.mp3`]);
         this.load.audio('castle', [`${sound}/castle.mp3`]);
         this.load.audio('Tuto_Battle', [`${sound}/Tuto_Battle.mp3`]);
+        this.load.audio('HorseBattle', [`${sound}/HorseBattle.mp3`]);
 
         // 효과음
         this.load.audio('sfx_attack', [`${sound}/sfx_attack.wav`]);
