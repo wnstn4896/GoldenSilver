@@ -2,9 +2,7 @@ export class StageSelectScene extends Phaser.Scene {
     constructor() {
         super({ key: 'StageSelectScene' });
         this.player;
-        this.cursors;
         this.spaceKey;
-        this.zKey;
 
         // 월드맵 간 이동 관련
         this.isAutoMove = false;
@@ -16,6 +14,7 @@ export class StageSelectScene extends Phaser.Scene {
         this.select = 0;
         this.stage;
         this.stageClear = Number(sessionStorage.getItem("stageClear")) || 0;
+        this.isBtnPressed;
     }
 
     create() {
@@ -37,6 +36,14 @@ export class StageSelectScene extends Phaser.Scene {
             stroke: '#000000', // 검정색 외곽선
             strokeThickness: 3, // 외곽선 두께
         }).setOrigin(0.5, 0.5).setInteractive();
+
+        // 점프 버튼
+        this.Button = this.add.tileSprite(675, this.stageText.y + this.stageText.height / 2 + 40, 210, 220, 'jump_btn').setOrigin(1.0, 0.5).setInteractive();
+        this.Button.setScale(0.3);
+        this.Button.on('pointerdown', () => this.isBtnPressed = true);
+        this.Button.on('pointerup', () => this.isBtnPressed = false);
+        this.Button.on('pointerout', () => this.isBtnPressed = false);
+        this.Button.setVisible(false);
 
         // 스프라이트 시트 없이 개별 이미지를 애니메이션으로 구성
         const walkFrames = [];
@@ -96,9 +103,7 @@ export class StageSelectScene extends Phaser.Scene {
         this.partner.setFlipX(true);
 
         // 키보드 입력
-        this.cursors = this.input.keyboard.createCursorKeys();
         this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
     }
 
     startAutoMove(x, y) {
@@ -137,6 +142,8 @@ export class StageSelectScene extends Phaser.Scene {
                 this.partner.setTexture("Aster_walk1");
 
                 this.isAutoMove = false;
+
+                this.Button.setVisible(true);
 
                 switch (this.select) {
                     case 0:
@@ -190,9 +197,9 @@ export class StageSelectScene extends Phaser.Scene {
         this.partner.setVelocity(0, 0);
 
         // 목적지 도착 후 선택 키 입력 시 해당 씬으로 전환
-        if (this.spaceKey.isDown && this.select != 0 && this.scene.get(this.stage))
+        if ((this.isBtnPressed || this.spaceKey.isDown) && this.select != 0 && this.scene.get(this.stage))
             this.scene.start(this.stage);
-        if (this.spaceKey.isDown && !this.scene.get(this.stage))
+        if ((this.isBtnPressed || this.spaceKey.isDown) && !this.scene.get(this.stage))
             alert('미완성');
     }
 }
