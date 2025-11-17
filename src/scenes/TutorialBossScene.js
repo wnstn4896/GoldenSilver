@@ -42,17 +42,17 @@ export class TutorialBossScene extends Phaser.Scene {
         const attackFrames = [];
         const attackFrames2 = [];
         const enemyFrames = [];
-        for (let i=1; i <= 6; i++){
+        for (let i = 1; i <= 6; i++) {
             walkFrames.push({ key: 'Reed_walk' + i });
             walkFrames2.push({ key: 'Aster_walk' + i });
-            enemyFrames.push({ key: 'Tuto_walk' + i});
+            enemyFrames.push({ key: 'Tuto_walk' + i });
         }
-        for (let i=1; i<=3; i++){
-            jumpFrames.push({ key: 'Reed_jump' + i});
-            jumpFrames2.push({ key: 'Aster_jump' + i});
+        for (let i = 1; i <= 3; i++) {
+            jumpFrames.push({ key: 'Reed_jump' + i });
+            jumpFrames2.push({ key: 'Aster_jump' + i });
 
-            attackFrames.push({ key: 'Reed_attack' + i});
-            attackFrames2.push({ key: 'Aster_attack' + i});
+            attackFrames.push({ key: 'Reed_attack' + i });
+            attackFrames2.push({ key: 'Aster_attack' + i });
         }
 
         // 애니메이션 정의
@@ -113,10 +113,10 @@ export class TutorialBossScene extends Phaser.Scene {
         this.partner.setFlipX(true);
         this.partner.setGravityY(this.gravity);  // 중력 설정
 
-         // 모바일 환경 감지
+        // 모바일 환경 감지
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-        if (isMobile){
+        if (isMobile) {
             // 왼쪽 버튼
             this.leftButton = this.add.tileSprite(140, 640, 210, 220, 'left_btn').setOrigin(1.0, 0.5).setInteractive();
             this.leftButton.setScale(0.4);
@@ -185,7 +185,7 @@ export class TutorialBossScene extends Phaser.Scene {
             padding: { top: 2, bottom: 2 },
         });
         this.uiElements.controlsText.setVisible(false);
-        
+
         this.dialogues = this.cache.json.get('TutorialDialogues');
 
 
@@ -238,51 +238,51 @@ export class TutorialBossScene extends Phaser.Scene {
         });
     }
 
-    updateEnemyHPBar(enemy){
-            if (!enemy.healthBar) return;
+    updateEnemyHPBar(enemy) {
+        if (!enemy.healthBar) return;
 
-            const barWidth = 40;
-            const barHeight = 6;
-            const x = enemy.x - barWidth / 2;
-            const y = enemy.y - 50;
+        const barWidth = 40;
+        const barHeight = 6;
+        const x = enemy.x - barWidth / 2;
+        const y = enemy.y - 50;
 
-            enemy.healthBar.clear();
-            enemy.healthBar.fillStyle(0x000000, 1);
-            enemy.healthBar.fillRect(x - 1, y - 1, barWidth + 2, barHeight + 2); // 테두리
+        enemy.healthBar.clear();
+        enemy.healthBar.fillStyle(0x000000, 1);
+        enemy.healthBar.fillRect(x - 1, y - 1, barWidth + 2, barHeight + 2); // 테두리
 
-            enemy.healthBar.fillStyle(0xff0000, 1);
-            const healthPercent = Phaser.Math.Clamp(enemy.hp / enemy.maxHp, 0, 1);
-            enemy.healthBar.fillRect(x, y, barWidth * healthPercent, barHeight);
-        }
+        enemy.healthBar.fillStyle(0xff0000, 1);
+        const healthPercent = Phaser.Math.Clamp(enemy.hp / enemy.maxHp, 0, 1);
+        enemy.healthBar.fillRect(x, y, barWidth * healthPercent, barHeight);
+    }
 
 
-        handlePlayerAttackHit(attack, enemy) {
-            if (!enemy.hp || enemy.hp <= 0) return;
+    handlePlayerAttackHit(attack, enemy) {
+        if (!enemy.hp || enemy.hp <= 0) return;
 
-            // 데미지 적용
-            enemy.hp -= this.atkDamage;
-            this.updateEnemyHPBar(enemy);
-            this.sound.add('Tuto_damaged').setVolume(0.6).play();
+        // 데미지 적용
+        enemy.hp -= this.atkDamage;
+        this.updateEnemyHPBar(enemy);
+        this.sound.add('Tuto_damaged').setVolume(0.6).play();
 
-            // 적 체력 0이면 처치
-            if (enemy.hp <= 0) {
-                const noticeText = this.add.text(950, 400, 'Press Jump', {
+        // 적 체력 0이면 처치
+        if (enemy.hp <= 0) {
+            const noticeText = this.add.text(950, 400, 'Press Jump', {
                 fontSize: '36px',
                 color: 'gray', // 기본 금색
                 fontFamily: 'HeirofLightBold',
             }).setOrigin(0.5, 0.5).setInteractive();
-                
-                this.cameras.main.flash(300, 255, 255, 255);
-                enemy.healthBar.destroy(); // 체력바 제거
-                enemy.setTexture('Tuto_defeated');
-                this.stageClear = true;
 
-                this.showDialogue();
-            }
+            this.cameras.main.flash(300, 255, 255, 255);
+            enemy.healthBar.destroy(); // 체력바 제거
+            enemy.setTexture('Tuto_defeated');
+            this.stageClear = true;
 
-            // 공격 이펙트 제거
-            attack.destroy();
+            this.showDialogue();
         }
+
+        // 공격 이펙트 제거
+        attack.destroy();
+    }
 
     update(time, delta) {
         const isOnGround = this.player.body.onFloor();  // 점프 중 상태 판별
@@ -326,7 +326,7 @@ export class TutorialBossScene extends Phaser.Scene {
                 this.partner.anims.stop();
                 this.player.setTexture('Reed_walk1');
                 this.partner.setTexture('Aster_walk1');
-            }       
+            }
         }
 
         this.enemies.children.iterate((enemy) => {
@@ -357,7 +357,7 @@ export class TutorialBossScene extends Phaser.Scene {
             });
         }
 
-        if (!isOnGround && this.jumpCooldown <= 120 && !this.isStunned){
+        if (!isOnGround && this.jumpCooldown <= 120 && !this.isStunned) {
             this.player.anims.stop();
             this.partner.anims.stop();
             this.player.setTexture('Reed_jump3');
@@ -370,15 +370,15 @@ export class TutorialBossScene extends Phaser.Scene {
         }
 
         // 평타 공격
-        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0 && !this.isStunned && !this.isMessages){
+        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0 && !this.isStunned && !this.isMessages) {
             this.attackCooldown = this.attackCooldownTime;
             this.partner.anims.stop();
             // 내려찍기
-            if (!isOnGround){
+            if (!isOnGround) {
                 this.isStunned = true;
                 this.player.anims.stop();
                 this.partner.setFlipX(!this.player.flipX);
-                
+
                 this.player.setVelocityY(800);
                 this.partner.setVelocityY(800);
                 this.sound.add('sfx_attack').setVolume(0.5).play();
@@ -390,16 +390,16 @@ export class TutorialBossScene extends Phaser.Scene {
                     this.partner.setY(600);
 
                     const attackEffect = this.playerAttacks.create(this.player.flipX ? this.player.x + 40 : this.player.x - 40, this.player.y, 'attack_effect');
-                    const attackEffect2 =  this.playerAttacks.create(this.partner.flipX ? this.partner.x + 40 : this.partner.x - 40, this.player.y, 'attack_effect');
+                    const attackEffect2 = this.playerAttacks.create(this.partner.flipX ? this.partner.x + 40 : this.partner.x - 40, this.player.y, 'attack_effect');
                     attackEffect.setFlipX(!this.player.flipX);
                     attackEffect.setScale(5.5);
                     attackEffect2.setFlipX(!this.partner.flipX);
                     attackEffect2.setScale(5.5);
-                    if (this.player.flipX){
+                    if (this.player.flipX) {
                         attackEffect.setVelocityX(60);
                         attackEffect2.setVelocityX(-80);
                     }
-                    else{
+                    else {
                         attackEffect.setVelocityX(-60);
                         attackEffect2.setVelocityX(80);
                     }
@@ -445,10 +445,9 @@ export class TutorialBossScene extends Phaser.Scene {
             this.showDialogue();
 
         // 문 쪽에서 점프 시 다음 씬 이동
-        if ((this.player.x < 1000 && this.player.x > 900) && (this.spaceKey.isDown || this.isJumpPressed) && this.stageClear){
+        if ((this.player.x < 1000 && this.player.x > 900) && (this.spaceKey.isDown || this.isJumpPressed) && this.stageClear) {
             this.bgm.stop();
             this.cameras.main.flash(300, 0, 0, 0);
-            alert('미완성');
             this.scene.start('StageSelectScene');
         }
     }

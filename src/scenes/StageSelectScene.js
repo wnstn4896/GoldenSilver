@@ -6,12 +6,16 @@ export class StageSelectScene extends Phaser.Scene {
         this.spaceKey;
         this.zKey;
 
+        // 월드맵 간 이동 관련
         this.isAutoMove = false;
         this.targetX = null;
         this.targetY = null;
         this.autoSpeed = 360;
 
-        this.select;
+        // 스테이지 선택 관련
+        this.select = 0;
+        this.stage;
+        this.stageClear = Number(sessionStorage.getItem("stageClear")) || 0;
     }
 
     create() {
@@ -37,7 +41,7 @@ export class StageSelectScene extends Phaser.Scene {
         // 스프라이트 시트 없이 개별 이미지를 애니메이션으로 구성
         const walkFrames = [];
         const walkFrames2 = [];
-        for (let i=1; i <= 6; i++){
+        for (let i = 1; i <= 6; i++) {
             walkFrames.push({ key: 'Reed_walk' + i });
             walkFrames2.push({ key: 'Aster_walk' + i });
         }
@@ -117,7 +121,6 @@ export class StageSelectScene extends Phaser.Scene {
 
     update(time, delta) {
         if (this.isAutoMove) {
-
             let dx = this.targetX - this.player.x;
             let dy = this.targetY - this.player.y;
             let dist = Math.sqrt(dx * dx + dy * dy);
@@ -135,18 +138,22 @@ export class StageSelectScene extends Phaser.Scene {
 
                 this.isAutoMove = false;
 
-                switch (this.select){
+                switch (this.select) {
                     case 0:
                         this.stageText.setText("Tutorial");
+                        this.stage = null;
                         break;
                     case 1:
                         this.stageText.setText("Stage 1");
+                        this.stage = 'Stage1FieldScene';
                         break;
                     case 2:
                         this.stageText.setText("Stage 2");
+                        this.stage = 'Stage2FieldScene';
                         break;
                     case 3:
                         this.stageText.setText("Final Stage");
+                        this.stage = 'HorseBattleScene';
                         break;
                 }
 
@@ -179,8 +186,13 @@ export class StageSelectScene extends Phaser.Scene {
             return;
         }
 
-        // 자동 이동이 아닐 땐 자연스럽게 멈춘 상태 유지
         this.player.setVelocity(0, 0);
         this.partner.setVelocity(0, 0);
+
+        // 목적지 도착 후 선택 키 입력 시 해당 씬으로 전환
+        if (this.spaceKey.isDown && this.select != 0 && this.scene.get(this.stage))
+            this.scene.start(this.stage);
+        if (this.spaceKey.isDown && !this.scene.get(this.stage))
+            alert('미완성');
     }
 }
