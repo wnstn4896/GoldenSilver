@@ -1,8 +1,8 @@
 import { MessageModule } from './MessageModule.js';
 
-export class TutorialFieldScene extends Phaser.Scene {
+export class Stage1FieldScene extends Phaser.Scene {
     constructor() {
-        super({ key: 'TutorialFieldScene' });
+        super({ key: 'Stage1FieldScene' });
         this.player;
         this.cursors;
         this.spaceKey;
@@ -32,7 +32,7 @@ export class TutorialFieldScene extends Phaser.Scene {
     }
 
     create() {
-        this.background = this.add.tileSprite(640, 360, 1280, 720, 'TutorialField');
+        this.background = this.add.tileSprite(640, 360, 1280, 720, 'Plain');
         this.physics.world.setBounds(-70, 0, 1430, 550); // 월드 경계 설정
 
         // 스프라이트 시트 없이 개별 이미지를 애니메이션으로 구성
@@ -190,7 +190,7 @@ export class TutorialFieldScene extends Phaser.Scene {
         });
         this.uiElements.controlsText.setVisible(false);
         
-        this.dialogues = this.cache.json.get('TutorialDialogues');
+        this.dialogues = this.cache.json.get('Stage1Dialogues');
 
         this.bgm = this.sound.add('castle', { loop: true });
         this.bgm.setVolume(0.4).play();
@@ -401,7 +401,7 @@ export class TutorialFieldScene extends Phaser.Scene {
 
         if (this.mapCount >= 2){
             this.bgm.stop();
-            this.scene.start('TutorialBossScene');
+            this.scene.start('Stage1BossScene');
         }
 
         // 마지막 대사 출력 오류 방지

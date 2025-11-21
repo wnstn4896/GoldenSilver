@@ -48,10 +48,13 @@ export class StageSelectScene extends Phaser.Scene {
         // 스프라이트 시트 없이 개별 이미지를 애니메이션으로 구성
         const walkFrames = [];
         const walkFrames2 = [];
+        const flagsFrames = [];
         for (let i = 1; i <= 6; i++) {
             walkFrames.push({ key: 'Reed_walk' + i });
             walkFrames2.push({ key: 'Aster_walk' + i });
         }
+        for (let i = 1; i <= 3; i++)
+            flagsFrames.push({key: 'flag' + i});
 
         // 애니메이션 정의
         this.anims.create({
@@ -66,30 +69,40 @@ export class StageSelectScene extends Phaser.Scene {
             frameRate: 12,
             repeat: -1
         });
+        this.anims.create({
+            key: 'flags',
+            frames: flagsFrames,
+            frameRate: 8,
+            repeat: -1
+        });
 
-        this.defaultIcon = this.add.sprite(325, 200, 'StageIcon').setInteractive();
+        this.defaultIcon = this.add.sprite(325, 200, 'flag1').setInteractive();
         this.defaultIcon.on('pointerdown', () => {
             this.startAutoMove(this.defaultIcon.x, this.defaultIcon.y);
             this.select = 0;
         });
+        this.defaultIcon.setScale(5);
 
-        this.stage1Icon = this.add.sprite(500, 350, 'StageIcon').setInteractive();
+        this.stage1Icon = this.add.sprite(500, 350, 'flag1').setInteractive();
         this.stage1Icon.on('pointerdown', () => {
             this.startAutoMove(this.stage1Icon.x, this.stage1Icon.y);
             this.select = 1;
         });
+        this.stage1Icon.setScale(5);
 
-        this.stage2Icon = this.add.sprite(1025, 550, 'StageIcon').setInteractive();
+        this.stage2Icon = this.add.sprite(1025, 550, 'flag1').setInteractive();
         this.stage2Icon.on('pointerdown', () => {
             this.startAutoMove(this.stage2Icon.x, this.stage2Icon.y);
             this.select = 2;
         });
+        this.stage2Icon.setScale(5);
 
-        this.stage3Icon = this.add.sprite(900, 220, 'StageIcon').setInteractive();
+        this.stage3Icon = this.add.sprite(900, 220, 'flag1').setInteractive();
         this.stage3Icon.on('pointerdown', () => {
             this.startAutoMove(this.stage3Icon.x, this.stage3Icon.y);
             this.select = 3;
         });
+        this.stage3Icon.setScale(5);
 
         // 기본 스프라이트 설정
         this.player = this.physics.add.sprite(350, 200, 'Reed_walk1');
@@ -125,6 +138,11 @@ export class StageSelectScene extends Phaser.Scene {
     }
 
     update(time, delta) {
+        this.defaultIcon.anims.play("flags", true);
+        this.stage1Icon.anims.play("flags", true);
+        this.stage2Icon.anims.play("flags", true);
+        this.stage3Icon.anims.play("flags", true);
+    
         if (this.isAutoMove) {
             let dx = this.targetX - this.player.x;
             let dy = this.targetY - this.player.y;
@@ -197,8 +215,9 @@ export class StageSelectScene extends Phaser.Scene {
         this.partner.setVelocity(0, 0);
 
         // 목적지 도착 후 선택 키 입력 시 해당 씬으로 전환
-        if ((this.isBtnPressed || this.spaceKey.isDown) && this.select != 0 && this.scene.get(this.stage))
+        if ((this.isBtnPressed || this.spaceKey.isDown) && this.select != 0 && this.scene.get(this.stage)){
             this.scene.start(this.stage);
+        }
         if ((this.isBtnPressed || this.spaceKey.isDown) && !this.scene.get(this.stage))
             alert('미완성');
     }

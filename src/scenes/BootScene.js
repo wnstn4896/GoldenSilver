@@ -17,6 +17,7 @@ export class BootScene extends Phaser.Scene {
             this.load.image('Reeds_Room' + i, `${img}/Reeds_Room` + i + '.png');
 
         this.load.image('Forest', `${img}/Forest.png`);
+        this.load.image('Plain', `${img}/Plain.png`);
 
         this.load.image('TutorialField', `${img}/TutorialField.png`);
         this.load.image('TutorialBossField', `${img}/TutorialBossField.png`);
@@ -49,11 +50,13 @@ export class BootScene extends Phaser.Scene {
             this.load.image('Aster_jump' + i, `${img}/Aster_jump` + i + '.png');
             this.load.image('Reed_attack' + i, `${img}/Reed_attack` + i + '.png');
             this.load.image('Aster_attack' + i, `${img}/Aster_attack` + i + '.png');
+            this.load.image('flag' + i, `${img}/flag` + i + '.png');
         }
 
         // 대사 메시지 JSON 로드
         this.load.json('PrologueDialogues', `${msg}/Prologue.json`);
         this.load.json('TutorialDialogues', `${msg}/Tutorial.json`);
+        this.load.json('Stage1Dialogues', `${msg}/Stage1.json`);
 
         // 사운드 로드
         this.load.audio('prologueBGM', [`${sound}/prologue.mp3`]);
