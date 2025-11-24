@@ -27,6 +27,8 @@ export class BootScene extends Phaser.Scene {
         this.load.image('Tuto_defeated', `${img}/Tuto_defeated.png`);
 
 
+        this.load.image('heart', `${img}/heart.png`);
+        this.load.image('heart_empty', `${img}/heart_empty.png`);
         this.load.image('attack_effect', `${img}/attack_effect.png`);
         this.load.image('arrow', `${img}/arrow.png`);
 
@@ -43,6 +45,7 @@ export class BootScene extends Phaser.Scene {
             this.load.image('Reed_walk' + i, `${img}/Reed_walk` + i + '.png');
             this.load.image('Aster_walk' + i, `${img}/Aster_walk` + i + '.png');
             this.load.image('Tuto_walk' + i, `${img}/Tuto_walk` + i + '.png');
+            this.load.image('Zombie_walk' + i, `${img}/Zombie_walk` + i + '.png');
             this.load.image('Reed_Horse' + i, `${img}/Reed_Horse` + i + '.png');
         }
         for (let i = 1; i <= 3; i++) {
@@ -51,6 +54,7 @@ export class BootScene extends Phaser.Scene {
             this.load.image('Reed_attack' + i, `${img}/Reed_attack` + i + '.png');
             this.load.image('Aster_attack' + i, `${img}/Aster_attack` + i + '.png');
             this.load.image('flag' + i, `${img}/flag` + i + '.png');
+            this.load.image('Zombie_death' + i, `${img}/Zombie_death` + i + '.png');
         }
 
         // 대사 메시지 JSON 로드

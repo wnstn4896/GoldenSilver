@@ -22,6 +22,11 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.isJumpPressed = false;
         this.isAtkPressed = false;
 
+        this.maxHP = 5; // 최대 HP
+        this.currentHP = 3; // 현재 HP
+        this.damageCooldown = 0;
+        this.damagedownTime = 2000; // 데미지 입은 직후 무적 시간
+
         this.mapCount = 0;
 
         // 대사 출력 관련
@@ -42,9 +47,12 @@ export class Stage1FieldScene extends Phaser.Scene {
         const jumpFrames2 = [];
         const attackFrames = [];
         const attackFrames2 = [];
+        const enemyWalkFrames = [];
+        const enemyDeathFrames = [];
         for (let i=1; i <= 6; i++){
             walkFrames.push({ key: 'Reed_walk' + i });
             walkFrames2.push({ key: 'Aster_walk' + i });
+            enemyWalkFrames.push({ key: 'Zombie_walk' + i });
         }
         for (let i=1; i<=3; i++){
             jumpFrames.push({ key: 'Reed_jump' + i});
@@ -52,6 +60,7 @@ export class Stage1FieldScene extends Phaser.Scene {
 
             attackFrames.push({ key: 'Reed_attack' + i});
             attackFrames2.push({ key: 'Aster_attack' + i});
+            enemyDeathFrames.push({ key: 'Zombie_death' + i});
         }
 
         // 애니메이션 정의
@@ -91,6 +100,18 @@ export class Stage1FieldScene extends Phaser.Scene {
             frameRate: 15,
             repeat: 0
         });
+        this.anims.create({
+            key: 'enemy_walk',
+            frames: enemyWalkFrames,
+            frameRate: 8,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'enemy_death',
+            frames: enemyDeathFrames,
+            frameRate: 5,
+            repeat: 0
+        });
 
         // 기본 스프라이트 설정
         this.player = this.physics.add.sprite(150, 500, 'Reed_walk1');
@@ -104,6 +125,16 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.partner.setScale(0.24);
         this.partner.setFlipX(true);
         this.partner.setGravityY(this.gravity);  // 중력 설정
+
+        // 플레이어 HP 아이콘 정의
+        this.heartIcons = [];
+
+        for (let i = 0; i < this.maxHP; i++) {
+            const heart = this.add.image(60 + i * 25, 90, 'heart_empty');
+            heart.setScale(0.7);
+            this.heartIcons.push(heart);
+        }
+        this.updateHPUI();
 
          // 모바일 환경 감지
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
@@ -147,39 +178,39 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
         this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
 
-        // 공격 판정 충돌 처리
-        this.physics.add.overlap(this.playerAttacks, this.enemies, this.handlePlayerAttackHit, null, this);
-
-
         // 장애물 생성
         this.enemies = this.physics.add.group({
-            key: 'barrel',
+            key: 'Zombie_walk1',
             repeat: 0, // 적 1개만 생성
-            setXY: { x: 800, y: 550 },
+            setXY: { x: 800, y: 500 },
         });
         this.enemies.children.iterate((enemy) => {
-            enemy.setScale(1);
+            enemy.setScale(0.29);
             enemy.setCollideWorldBounds(true); // 월드 경계 밖으로 못 나가게 설정
-            enemy.setGravityY(this.gravity);
-            enemy.setImmovable(true);
-            enemy.setSize(enemy.width * 0.8, enemy.height * 0.9); // 충돌 박스를 살짝 줄임
-            enemy.setOffset(enemy.width * 0.1, enemy.height * 0.1); // 위치 조정
 
-            enemy.disableBody(true, true);
+            // enemy.setGravityY(this.gravity);
+
+            // 체력 추가
+            enemy.maxHp = 100;
+            enemy.hp = 100;
+
+            // 체력바 생성
+            enemy.healthBar = this.add.graphics();
+            enemy.healthBar.setVisible(false);
+            this.updateEnemyHPBar(enemy);
+
+            enemy.setVisible(false);
         });
-        // 충돌 처리
-        this.physics.add.collider(this.player, this.enemies, (player, enemy) => {
-            if (player.body.touching.down && enemy.body.touching.up) {
-                player.setVelocityY(50);
-            }
-        });
+
+        // 공격 판정 충돌 처리
+        this.physics.add.overlap(this.playerAttacks, this.enemies, this.handlePlayerAttackHit, null, this);
 
         // 대사 출력 관련 모듈 정의
         this.MessageModule = new MessageModule(this);
         this.MessageModule.createUI();
         this.MessageModule.hideUI();
 
-        // 대화창 조작 안내 텍스트
+        // 텍스트 관련
         this.uiElements = {};
 
         this.uiElements.controlsText = this.add.text(910, 620, '(Press [SPACE] OR Click)', {
@@ -189,6 +220,13 @@ export class Stage1FieldScene extends Phaser.Scene {
             padding: { top: 2, bottom: 2 },
         });
         this.uiElements.controlsText.setVisible(false);
+
+        this.uiElements.lifeText = this.add.text(50, 40, '--- LIFE ---', {
+            fontSize: '24px',
+            fontFamily: 'HeirofLightBold',
+            color: '#ffffff',
+            padding: { top: 2, bottom: 2 },
+        });
         
         this.dialogues = this.cache.json.get('Stage1Dialogues');
 
@@ -230,6 +268,57 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.time.delayedCall(100, () => {
             this.isStunned = false;
         });
+    }
+
+    // 플레이어 HP 갱신
+    updateHPUI() {
+        for (let i = 0; i < this.maxHP; i++) {
+            if (i < this.currentHP) {
+                this.heartIcons[i].setTexture('heart');         // 채워진 하트
+            } else {
+                this.heartIcons[i].setTexture('heart_empty');   // 빈 하트
+            }
+        }
+    }
+
+    updateEnemyHPBar(enemy) {
+        if (!enemy.healthBar) return;
+
+        const barWidth = 40;
+        const barHeight = 6;
+        const x = enemy.x - barWidth / 2;
+        const y = enemy.y - 60;
+
+        enemy.healthBar.clear();
+        enemy.healthBar.fillStyle(0x000000, 1);
+        enemy.healthBar.fillRect(x - 1, y - 1, barWidth + 2, barHeight + 2); // 테두리
+
+        enemy.healthBar.fillStyle(0xff0000, 1);
+        const healthPercent = Phaser.Math.Clamp(enemy.hp / enemy.maxHp, 0, 1);
+        enemy.healthBar.fillRect(x, y, barWidth * healthPercent, barHeight);
+    }
+
+    handlePlayerAttackHit(attack, enemy) {
+        if (!enemy.hp || enemy.hp <= 0) return;
+
+        // 데미지 적용
+        enemy.hp -= this.atkDamage;
+        this.updateEnemyHPBar(enemy);
+        this.sound.add('Tuto_damaged').setVolume(0.6).play();
+
+        // 적 체력 0이면 처치
+        if (enemy.hp <= 0) {
+            this.cameras.main.flash(300, 255, 255, 255);
+            enemy.healthBar.destroy(); // 체력바 제거
+            enemy.anims.stop();
+            enemy.anims.play('enemy_death', true);
+            this.stageClear = true;
+
+            this.showDialogue();
+        }
+
+        // 공격 이펙트 제거
+        attack.destroy();
     }
 
     update(time, delta) {
@@ -282,6 +371,27 @@ export class Stage1FieldScene extends Phaser.Scene {
                 this.partner.setTexture('Aster_walk1');
             }       
         }
+
+        this.enemies.children.iterate((enemy) => {
+            if (enemy.hp > 0) {
+                if (enemy.x < this.player.x) {
+                    enemy.setFlipX(true);
+                    enemy.setVelocityX(100);
+                } else {
+                    enemy.setFlipX(false);
+                    enemy.setVelocityX(-100);
+                }
+
+                if (!enemy.anims.isPlaying || enemy.anims.currentAnim.key !== 'enemy_walk') {
+                    enemy.anims.play('enemy_walk', true);
+                }
+
+            } else {
+                enemy.setVelocityX(0);
+            }
+
+            this.updateEnemyHPBar(enemy);
+        });
 
         // 점프 처리
         if (isOnGround && (this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0 && !this.isStunned  && !this.isMessages) {
@@ -390,22 +500,36 @@ export class Stage1FieldScene extends Phaser.Scene {
         }
 
         // 대사 출력
-        if ((isOnGround && this.currentIndex < 2) || (this.mapCount >= 1 && this.player.x >= 500))
+        if (isOnGround && this.currentIndex < 2)
             this.showDialogue();
 
-        if (this.mapCount >= 1) {
+        if (this.mapCount === 1) {
             this.enemies.children.iterate(enemy => {
-                enemy.enableBody(true, enemy.x, enemy.y, true, true);
+                enemy.setVisible(true);
+                enemy.healthBar.setVisible(true);
             });
         }
 
         if (this.mapCount >= 2){
             this.bgm.stop();
-            this.scene.start('Stage1BossScene');
+            alert('미완성');
+            // this.scene.start('Stage1BossScene');
         }
 
         // 마지막 대사 출력 오류 방지
         if (this.currentIndex >= 8)
             this.currentIndex = this.dialogues.length;
+
+        // 데미지 감소 테스트 용도
+        if (this.shiftKey.isDown && this.damageCooldown <= 0){
+            this.cameras.main.flash(2000, 255, 0, 0);
+            this.damageCooldown = this.damagedownTime;
+            this.currentHP -= 1;
+            if (this.currentHP < 0) this.currentHP = 0;
+            this.updateHPUI();
+        }
+        if (this.damageCooldown > 0) {
+            this.damageCooldown -= delta;
+        }
     }
 }
