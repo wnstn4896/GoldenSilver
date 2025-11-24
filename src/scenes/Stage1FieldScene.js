@@ -23,7 +23,7 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.isAtkPressed = false;
 
         this.maxHP = 5; // 최대 HP
-        this.currentHP = 3; // 현재 HP
+        this.currentHP = 5; // 현재 HP
         this.damageCooldown = 0;
         this.damagedownTime = 2000; // 데미지 입은 직후 무적 시간
 
@@ -171,6 +171,7 @@ export class Stage1FieldScene extends Phaser.Scene {
 
         // 공격 이펙트 (실질적 공격 판정 범위)
         this.playerAttacks = this.physics.add.group();
+        this.enemyAttacks = this.physics.add.group();
 
         // 키보드 입력
         this.cursors = this.input.keyboard.createCursorKeys();
@@ -188,7 +189,7 @@ export class Stage1FieldScene extends Phaser.Scene {
             enemy.setScale(0.29);
             enemy.setCollideWorldBounds(true); // 월드 경계 밖으로 못 나가게 설정
 
-            // enemy.setGravityY(this.gravity);
+            enemy.setGravityY(this.gravity);
 
             // 체력 추가
             enemy.maxHp = 100;
@@ -301,20 +302,33 @@ export class Stage1FieldScene extends Phaser.Scene {
     handlePlayerAttackHit(attack, enemy) {
         if (!enemy.hp || enemy.hp <= 0) return;
 
-        // 데미지 적용
-        enemy.hp -= this.atkDamage;
-        this.updateEnemyHPBar(enemy);
-        this.sound.add('Tuto_damaged').setVolume(0.6).play();
+        if (this.mapCount === 1){
+            // 데미지 적용
+            enemy.hp -= this.atkDamage;
+            this.updateEnemyHPBar(enemy);
+            this.sound.add('Tuto_damaged').setVolume(0.6).play();
 
-        // 적 체력 0이면 처치
-        if (enemy.hp <= 0) {
-            this.cameras.main.flash(300, 255, 255, 255);
-            enemy.healthBar.destroy(); // 체력바 제거
-            enemy.anims.stop();
-            enemy.anims.play('enemy_death', true);
-            this.stageClear = true;
+            // 적 체력 0이면 처치
+            if (enemy.hp <= 0) {
+                this.cameras.main.flash(300, 255, 255, 255);
+                enemy.healthBar.destroy(); // 체력바 제거
+                enemy.anims.stop();
+                enemy.anims.play('enemy_death', true);
+                this.stageClear = true;
 
-            this.showDialogue();
+                this.time.delayedCall(1000, () => {
+                    const explotion1 = this.enemyAttacks.create(enemy.x - 100, enemy.y, 'attack_effect');
+                    const explotion2 = this.enemyAttacks.create(enemy.x + 100, enemy.y, 'attack_effect');
+                    explotion1.setFlipX(enemy.flipX);
+                    explotion1.setScale(5.5);
+                    explotion2.setFlipX(!enemy.flipX);
+                    explotion2.setScale(5.5);
+                    explotion1.setVelocityX(-900);
+                    explotion2.setVelocityX(900);
+                });
+
+                this.showDialogue();
+            }
         }
 
         // 공격 이펙트 제거
@@ -512,7 +526,6 @@ export class Stage1FieldScene extends Phaser.Scene {
 
         if (this.mapCount >= 2){
             this.bgm.stop();
-            alert('미완성');
             // this.scene.start('Stage1BossScene');
         }
 
