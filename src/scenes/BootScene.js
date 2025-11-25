@@ -15,6 +15,8 @@ export class BootScene extends Phaser.Scene {
 
         for (let i = 1; i <= 3; i++)
             this.load.image('Reeds_Room' + i, `${img}/Reeds_Room` + i + '.png');
+        this.load.image('Primula_appear', `${img}/Primula_appear.png`);
+        this.load.image('Reed_Aster_confront', `${img}/Reed_Aster_confront.png`);
 
         this.load.image('Forest', `${img}/Forest.png`);
         this.load.image('Plain', `${img}/Plain.png`);
