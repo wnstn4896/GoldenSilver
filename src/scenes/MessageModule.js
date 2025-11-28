@@ -160,6 +160,21 @@ export class MessageModule {
                 controlsText.setStyle({ color: '#FFFFFF', });
                 nameText.setStyle({ color: '#FFFFFF', });
                 break;
+            case '프리뮬러':
+                // 연한 검은색 베이스
+                dialogBox.fillStyle(0x363636, 0.8);
+                nameBox.fillStyle(0x363636, 0.8);
+                dialogBox.fillRoundedRect(140, 500, 1000, 150, 20);
+                nameBox.fillRoundedRect(140, 460, 230, 40, 10);
+                // 푸른색 테두리
+                dialogBox.lineStyle(3, 0x0067a3, 0.8);
+                nameBox.lineStyle(3, 0x0067a3, 0.8);
+                dialogBox.strokeRoundedRect(140, 500, 1000, 150, 20);
+                nameBox.strokeRoundedRect(140, 460, 230, 40, 10);
+                dialogueText.setStyle({ color: '#FFFFFF', });
+                controlsText.setStyle({ color: '#FFFFFF', });
+                nameText.setStyle({ color: '#FFFFFF', });
+                break;
             default:
                 this.defaultBox();
         }
