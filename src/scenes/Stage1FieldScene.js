@@ -356,6 +356,7 @@ export class Stage1FieldScene extends Phaser.Scene {
 
                 this.isStunned = false;
                 this.jumpCooldown = 0;
+                this.time.delayedCall(300, () => { enemy.setTexture('Zombie_death3'); });
 
                 if (!this.stageClear){
                     this.time.delayedCall(1000, () => {
