@@ -64,7 +64,7 @@ export class TitleScene extends Phaser.Scene {
                 color: '#B8860B', // 어두운 금색
             });
             if (this.stageClear){
-                alert('플레이 기록 및 저장 데이터가 확인되어 스테이지 선택 화면으로 이동합니다.');
+                alert('플레이 기록 및 저장 데이터가 확인되어 스테이지 선택 화면으로 이동합니다.\n원하는 지점부터 이어하기가 가능합니다.');
                 this.scene.start('StageSelectScene');
             }
             else

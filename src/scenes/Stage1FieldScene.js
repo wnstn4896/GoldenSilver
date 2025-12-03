@@ -6,7 +6,6 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.player;
         this.cursors;
         this.spaceKey;
-        this.shiftKey;
         this.zKey;
         this.jumpHeight = -380;    // 점프 높이
         this.gravity = 450;       // 중력 값
@@ -28,6 +27,11 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.damagedownTime = 2000; // 데미지 입은 직후 무적 시간
 
         this.mapCount = 0;
+        this.stageClear = false;
+
+        // 적 움직임과 대사 연동 연출을 위한 임시 변수
+        this.enemyFreeMove = false;
+        this.enemyFreeTimerDone = false;
 
         // 대사 출력 관련
         this.dialogues = [];
@@ -176,10 +180,9 @@ export class Stage1FieldScene extends Phaser.Scene {
         // 키보드 입력
         this.cursors = this.input.keyboard.createCursorKeys();
         this.spaceKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        this.shiftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
         this.zKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
 
-        // 장애물 생성
+        // 적 생성
         this.enemies = this.physics.add.group({
             key: 'Zombie_walk1',
             repeat: 0, // 적 1개만 생성
@@ -188,6 +191,10 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.enemies.children.iterate((enemy) => {
             enemy.setScale(0.29);
             enemy.setCollideWorldBounds(true); // 월드 경계 밖으로 못 나가게 설정
+
+            // 충돌 판정 범위 조정
+            enemy.setSize(200, 380);
+            enemy.setOffset(50, 50);
 
             enemy.setGravityY(this.gravity);
 
@@ -201,10 +208,16 @@ export class Stage1FieldScene extends Phaser.Scene {
             this.updateEnemyHPBar(enemy);
 
             enemy.setVisible(false);
+            enemy.setActive(false);
+            enemy.body.enable = false;
         });
 
         // 공격 판정 충돌 처리
         this.physics.add.overlap(this.playerAttacks, this.enemies, this.handlePlayerAttackHit, null, this);
+
+        // 데미지 충돌 처리
+        this.physics.add.overlap(this.player, this.enemies, this.handlePlayerDamaged, null, this);
+        this.physics.add.overlap(this.player, this.enemyAttacks, this.handlePlayerDamaged, null, this);
 
         // 대사 출력 관련 모듈 정의
         this.MessageModule = new MessageModule(this);
@@ -311,21 +324,56 @@ export class Stage1FieldScene extends Phaser.Scene {
             // 적 체력 0이면 처치
             if (enemy.hp <= 0) {
                 this.cameras.main.flash(300, 255, 255, 255);
-                enemy.healthBar.destroy(); // 체력바 제거
+                enemy.healthBar.destroy();
                 enemy.anims.stop();
                 enemy.anims.play('enemy_death', true);
-                this.stageClear = true;
 
-                this.time.delayedCall(1000, () => {
-                    const explotion1 = this.enemyAttacks.create(enemy.x - 100, enemy.y, 'attack_effect');
-                    const explotion2 = this.enemyAttacks.create(enemy.x + 100, enemy.y, 'attack_effect');
-                    explotion1.setFlipX(enemy.flipX);
-                    explotion1.setScale(5.5);
-                    explotion2.setFlipX(!enemy.flipX);
-                    explotion2.setScale(5.5);
-                    explotion1.setVelocityX(-900);
-                    explotion2.setVelocityX(900);
+                // 자폭 경고 표시를 위한 그래픽스
+                const warning = this.add.graphics();
+                warning.fillStyle(0xff0000, 0.25);  // 반투명 빨간색
+
+                // 화면 전체 길이
+                const screenLeft = 0;
+                const screenRight = 1280;  // 너의 해상도 1280x720 기준
+
+                const height = 80;     // 경고 라인의 높이
+                const y = enemy.y - height / 2;
+
+                // 왼쪽 방향 경고
+                warning.fillRect(screenLeft, y, enemy.x - screenLeft, height);
+
+                // 오른쪽 방향 경고
+                warning.fillRect(enemy.x, y, screenRight - enemy.x, height);
+
+                // 깜빡임 효과
+                this.tweens.add({
+                    targets: warning,
+                    alpha: 0.1,
+                    yoyo: true,
+                    repeat: -1,
+                    duration: 200
                 });
+
+                if (!this.stageClear){
+                    this.time.delayedCall(1000, () => {
+                        warning.destroy();
+
+                        const explotion1 = this.enemyAttacks.create(enemy.x - 100, enemy.y, 'attack_effect');
+                        const explotion2 = this.enemyAttacks.create(enemy.x + 100, enemy.y, 'attack_effect');
+
+                        explotion1.setFlipX(enemy.flipX);
+                        explotion1.setScale(5);
+                        explotion2.setFlipX(!enemy.flipX);
+                        explotion2.setScale(5);
+
+                        explotion1.setVelocityX(-900);  // -> 왼쪽 끝까지
+                        explotion2.setVelocityX(900);   // -> 오른쪽 끝까지
+                        enemy.destroy();
+                        this.time.delayedCall(1500, () => {
+                            this.stageClear = true;
+                        });
+                    });
+                }
 
                 this.showDialogue();
             }
@@ -335,11 +383,24 @@ export class Stage1FieldScene extends Phaser.Scene {
         attack.destroy();
     }
 
+    // 데미지 처리
+    handlePlayerDamaged(player, enemy) {
+        if (this.damageCooldown > 0) return; // 무적 시간 적용
+
+        this.cameras.main.flash(1000, 255, 0, 0);
+        this.damageCooldown = this.damagedownTime;
+
+        this.currentHP -= 1;
+        if (this.currentHP < 0) this.currentHP = 0;
+
+        this.updateHPUI();
+    }
+
     update(time, delta) {
         const isOnGround = this.player.body.onFloor();  // 점프 중 상태 판별
 
         // 이동 처리
-        if ((this.cursors.right.isDown || this.isRightPressed) && this.attackCooldown <= 200 && !this.isStunned && !this.isMessages) {
+        if ((this.cursors.right.isDown || this.isRightPressed) && this.attackCooldown <= 200 && !this.isStunned && !this.isMessages && !this.enemyFreeMove) {
             if (this.mapCount < 1){
                 this.background.tilePositionX += 3;
                 this.player.setVelocityX(280);
@@ -360,7 +421,7 @@ export class Stage1FieldScene extends Phaser.Scene {
                 duration: 100,
                 ease: 'Linear'
             });
-        } else if ((this.cursors.left.isDown || this.isLeftPressed) && this.attackCooldown <= 200 && !this.isStunned && !this.isMessages) {
+        } else if ((this.cursors.left.isDown || this.isLeftPressed) && this.attackCooldown <= 200 && !this.isStunned && !this.isMessages && !this.enemyFreeMove) {
             this.player.setVelocityX(-360);
             if (isOnGround && !this.player.anims.isPlaying) {
                 this.player.anims.play('walk', true);
@@ -387,6 +448,29 @@ export class Stage1FieldScene extends Phaser.Scene {
         }
 
         this.enemies.children.iterate((enemy) => {
+            // 대사 창 출력 시 이동 정지
+            if (this.isMessages && !this.enemyFreeMove) {
+                enemy.setVelocityX(0);
+                enemy.anims.stop();
+                return;
+            }
+
+            // 1초간 잠시 움직이는 연출
+            if (this.isMessages && this.enemyFreeMove) {
+                if (enemy.x < this.player.x) {
+                    enemy.setFlipX(true);
+                    enemy.setVelocityX(100);
+                } else {
+                    enemy.setFlipX(false);
+                    enemy.setVelocityX(-100);
+                }
+                if (!enemy.anims.isPlaying || enemy.anims.currentAnim.key !== 'enemy_walk') {
+                    enemy.anims.play('enemy_walk', true);
+                }
+                return;
+            }
+
+            // 일반적인 이동 패턴
             if (enemy.hp > 0) {
                 if (enemy.x < this.player.x) {
                     enemy.setFlipX(true);
@@ -395,20 +479,18 @@ export class Stage1FieldScene extends Phaser.Scene {
                     enemy.setFlipX(false);
                     enemy.setVelocityX(-100);
                 }
-
                 if (!enemy.anims.isPlaying || enemy.anims.currentAnim.key !== 'enemy_walk') {
                     enemy.anims.play('enemy_walk', true);
                 }
-
             } else {
                 enemy.setVelocityX(0);
             }
-
             this.updateEnemyHPBar(enemy);
         });
 
+
         // 점프 처리
-        if (isOnGround && (this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0 && !this.isStunned  && !this.isMessages) {
+        if (isOnGround && (this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0 && !this.isStunned && !this.enemyFreeMove) {
             this.sound.add('sfx_jump').setVolume(0.6).play();
             this.sound.add('sfx_jump2').setVolume(0.2).play();
             this.player.anims.play('jump', true);
@@ -433,7 +515,7 @@ export class Stage1FieldScene extends Phaser.Scene {
         }
 
         // 평타 공격
-        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0 && !this.isStunned && !this.isMessages){
+        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0 && !this.isStunned && !this.isMessages && !this.enemyFreeMove){
             this.attackCooldown = this.attackCooldownTime;
             this.partner.anims.stop();
             // 내려찍기
@@ -517,32 +599,49 @@ export class Stage1FieldScene extends Phaser.Scene {
         if (isOnGround && this.currentIndex < 2)
             this.showDialogue();
 
-        if (this.mapCount === 1) {
-            this.enemies.children.iterate(enemy => {
+        this.enemies.children.iterate(enemy => {
+            if (this.mapCount === 1) {
+                enemy.setActive(true);
                 enemy.setVisible(true);
+                enemy.body.enable = true;
                 enemy.healthBar.setVisible(true);
-            });
-        }
+            } else {
+                enemy.setActive(false);
+                enemy.setVisible(false);
+                enemy.body.enable = false;
+                enemy.setVelocity(0);
+                enemy.healthBar.setVisible(false);
+            }
+        });
+
+        if (this.mapCount === 1 && this.player.x >= 100)
+            this.showDialogue();
 
         if (this.mapCount >= 2){
             this.bgm.stop();
-            // this.scene.start('Stage1BossScene');
+            this.scene.start('Stage1BossScene');
         }
 
-        // 마지막 대사 출력 오류 방지
-        if (this.currentIndex >= 8)
-            this.currentIndex = this.dialogues.length;
+        if (this.currentIndex === 11 && !this.enemyFreeTimerDone) {
+            this.isMessages = false;
+            this.MessageModule.hideUI();
+            this.uiElements.controlsText.setVisible(false);
+            this.physics.resume();
+            this.enemyFreeMove = true;
 
-        // 데미지 감소 테스트 용도
-        if (this.shiftKey.isDown && this.damageCooldown <= 0){
-            this.cameras.main.flash(2000, 255, 0, 0);
-            this.damageCooldown = this.damagedownTime;
-            this.currentHP -= 1;
-            if (this.currentHP < 0) this.currentHP = 0;
-            this.updateHPUI();
+            this.time.delayedCall(1000, () => {
+                this.enemyFreeMove = false;
+                this.enemyFreeTimerDone = true;
+                this.showDialogue();
+            });
         }
-        if (this.damageCooldown > 0) {
+
+        if (this.currentIndex === 15 && !this.stageClear)
+            this.endDialogue();
+
+        // 피격 쿨타임 처리 
+        if (this.damageCooldown > 0)
             this.damageCooldown -= delta;
-        }
+        console.log(this.currentIndex);
     }
 }
