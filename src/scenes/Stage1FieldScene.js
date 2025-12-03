@@ -354,6 +354,9 @@ export class Stage1FieldScene extends Phaser.Scene {
                     duration: 200
                 });
 
+                this.isStunned = false;
+                this.jumpCooldown = 0;
+
                 if (!this.stageClear){
                     this.time.delayedCall(1000, () => {
                         warning.destroy();
