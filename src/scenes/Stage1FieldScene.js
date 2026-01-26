@@ -334,7 +334,7 @@ export class Stage1FieldScene extends Phaser.Scene {
 
                 // 화면 전체 길이
                 const screenLeft = 0;
-                const screenRight = 1280;  // 너의 해상도 1280x720 기준
+                const screenRight = 1280;
 
                 const height = 80;     // 경고 라인의 높이
                 const y = enemy.y - height / 2;
@@ -370,8 +370,8 @@ export class Stage1FieldScene extends Phaser.Scene {
                         explotion2.setFlipX(!enemy.flipX);
                         explotion2.setScale(5);
 
-                        explotion1.setVelocityX(-900);  // -> 왼쪽 끝까지
-                        explotion2.setVelocityX(900);   // -> 오른쪽 끝까지
+                        explotion1.setVelocityX(-900);
+                        explotion2.setVelocityX(900);
                         enemy.destroy();
                         this.time.delayedCall(1500, () => {
                             this.stageClear = true;
