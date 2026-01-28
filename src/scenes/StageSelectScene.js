@@ -112,7 +112,7 @@ export class StageSelectScene extends Phaser.Scene {
 
         this.partner = this.physics.add.sprite(300, 200, 'Aster_walk1');
         this.partner.setCollideWorldBounds(true);
-        this.partner.setScale(0.24);
+        this.partner.setScale(0.27);
         this.partner.setFlipX(true);
 
         // 키보드 입력
@@ -157,7 +157,7 @@ export class StageSelectScene extends Phaser.Scene {
                 this.partner.anims.stop();
 
                 this.player.setTexture("Reed_walk1");
-                this.partner.setTexture("Aster_walk1");
+                this.partner.setTexture("Aster_walk2");
 
                 this.isAutoMove = false;
 

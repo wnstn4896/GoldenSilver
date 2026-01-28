@@ -99,9 +99,9 @@ export class TutorialFieldScene extends Phaser.Scene {
         this.player.setFlipX(true);
         this.player.setGravityY(this.gravity);  // 중력 설정
 
-        this.partner = this.physics.add.sprite(50, 550, 'Aster_walk1');
+        this.partner = this.physics.add.sprite(50, 550, 'Aster_walk2');
         this.partner.setCollideWorldBounds(true);
-        this.partner.setScale(0.24);
+        this.partner.setScale(0.27);
         this.partner.setFlipX(true);
         this.partner.setGravityY(this.gravity);  // 중력 설정
 
@@ -279,7 +279,7 @@ export class TutorialFieldScene extends Phaser.Scene {
                 this.player.anims.stop();
                 this.partner.anims.stop();
                 this.player.setTexture('Reed_walk1');
-                this.partner.setTexture('Aster_walk1');
+                this.partner.setTexture('Aster_walk2');
             }       
         }
 
@@ -324,7 +324,6 @@ export class TutorialFieldScene extends Phaser.Scene {
 
                 this.time.delayedCall(250, () => {
                     this.atkDamage = 50;
-                    this.partner.setScale(0.26);
                     this.partner.anims.play('attack2', true);
                     this.partner.setY(600);
 
@@ -352,8 +351,6 @@ export class TutorialFieldScene extends Phaser.Scene {
                 this.time.delayedCall(1000, () => {
                     this.atkDamage = 0;
                     this.partner.anims.stop();
-                    this.partner.setTexture('Aster_jump2');
-                    this.partner.setScale(0.24);
                     this.isStunned = false;
                 });
             } else {
