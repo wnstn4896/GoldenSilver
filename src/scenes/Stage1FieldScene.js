@@ -406,7 +406,7 @@ export class Stage1FieldScene extends Phaser.Scene {
         // 이동 처리
         if ((this.cursors.right.isDown || this.isRightPressed) && this.attackCooldown <= 200 && !this.isStunned && !this.isMessages && !this.enemyFreeMove) {
             if (this.mapCount < 1){
-                this.background.tilePositionX += 3;
+                this.background.tilePositionX += 2.16;
                 this.player.setVelocityX(280);
             } else if (this.mapCount >= 1) {
                 this.player.setVelocityX(360);
