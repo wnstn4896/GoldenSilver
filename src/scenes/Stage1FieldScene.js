@@ -124,7 +124,7 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.player.setFlipX(true);
         this.player.setGravityY(this.gravity);  // 중력 설정
 
-        this.partner = this.physics.add.sprite(50, 500, 'Aster_walk2');
+        this.partner = this.physics.add.sprite(50, 500, 'Aster_walk1');
         this.partner.setCollideWorldBounds(true);
         this.partner.setScale(0.27);
         this.partner.setFlipX(true);
@@ -447,7 +447,7 @@ export class Stage1FieldScene extends Phaser.Scene {
                 this.player.anims.stop();
                 this.partner.anims.stop();
                 this.player.setTexture('Reed_walk1');
-                this.partner.setTexture('Aster_walk2');
+                this.partner.setTexture('Aster_walk1');
             }       
         }
 
