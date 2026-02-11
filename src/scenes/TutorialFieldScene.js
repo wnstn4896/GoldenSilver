@@ -387,7 +387,7 @@ export class TutorialFieldScene extends Phaser.Scene {
         }
 
         // 대사 출력
-        if ((isOnGround && this.currentIndex < 2) || (this.mapCount >= 1 && this.player.x >= 500))
+        if ((isOnGround && this.currentIndex < 2) || (this.mapCount >= 1 && this.player.x >= 500 && this.currentIndex < 5))
             this.showDialogue();
 
         if (this.mapCount >= 1) {
