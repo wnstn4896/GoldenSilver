@@ -285,8 +285,7 @@ export class TutorialFieldScene extends Phaser.Scene {
 
         // 점프 처리
         if (isOnGround && (this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0 && !this.isStunned  && !this.isMessages) {
-            this.sound.add('sfx_jump').setVolume(0.6).play();
-            this.sound.add('sfx_jump2').setVolume(0.2).play();
+            this.sound.add('sfx_jump').setVolume(1.8).play();
             this.player.anims.play('jump', true);
             this.partner.anims.play('jump2', true);
             this.jumpCooldown = this.jumpCooldownTime;  // 쿨타임 시작

@@ -74,7 +74,6 @@ export class BootScene extends Phaser.Scene {
         // 효과음
         this.load.audio('sfx_attack', [`${sound}/sfx_attack.wav`]);
         this.load.audio('sfx_jump', [`${sound}/sfx_jump.wav`]);
-        this.load.audio('sfx_jump2', [`${sound}/sfx_jump2.mp3`]);
         this.load.audio('sfx_jumpattack', [`${sound}/sfx_jumpattack.ogg`]);
         this.load.audio('Tuto_damaged', [`${sound}/Tuto_damaged.wav`]);
         this.load.audio('sfx_crossbow', [`${sound}/sfx_crossbow.mp3`]);

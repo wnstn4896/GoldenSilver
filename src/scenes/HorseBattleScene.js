@@ -209,7 +209,7 @@ export class HorseBattleScene extends Phaser.Scene {
 
         // 점프(승마 상태) 처리
         if ((this.spaceKey.isDown || this.isJumpPressed) && this.jumpCooldown <= 0) {
-            this.sound.add('sfx_jump').setVolume(0.2).play();
+            this.sound.add('sfx_jump').setVolume(1.8).play();
             this.jumpCooldown = this.jumpCooldownTime;  // 쿨타임 시작
             this.time.delayedCall(100, () => {
                 this.player.setVelocityY(this.jumpHeight);  // 점프 높이 설정
