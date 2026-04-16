@@ -14,7 +14,7 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.attackCooldown = 0;
         this.attackCooldownTime = 750;
         this.isStunned = false;
-        this.atkDamage = 0; 
+        this.atkDamage = 0;
 
         this.isLeftPressed = false;
         this.isRightPressed = false;
@@ -37,7 +37,7 @@ export class Stage1FieldScene extends Phaser.Scene {
         this.dialogues = [];
         this.currentIndex = 0;
         this.MessageModule;
-        this.isMessages; 
+        this.isMessages;
     }
 
     create() {
@@ -53,18 +53,18 @@ export class Stage1FieldScene extends Phaser.Scene {
         const attackFrames2 = [];
         const enemyWalkFrames = [];
         const enemyDeathFrames = [];
-        for (let i=1; i <= 6; i++){
+        for (let i = 1; i <= 6; i++) {
             walkFrames.push({ key: 'Reed_walk' + i });
             walkFrames2.push({ key: 'Aster_walk' + i });
             enemyWalkFrames.push({ key: 'Zombie_walk' + i });
         }
-        for (let i=1; i<=3; i++){
-            jumpFrames.push({ key: 'Reed_jump' + i});
-            jumpFrames2.push({ key: 'Aster_jump' + i});
+        for (let i = 1; i <= 3; i++) {
+            jumpFrames.push({ key: 'Reed_jump' + i });
+            jumpFrames2.push({ key: 'Aster_jump' + i });
 
-            attackFrames.push({ key: 'Reed_attack' + i});
-            attackFrames2.push({ key: 'Aster_attack' + i});
-            enemyDeathFrames.push({ key: 'Zombie_death' + i});
+            attackFrames.push({ key: 'Reed_attack' + i });
+            attackFrames2.push({ key: 'Aster_attack' + i });
+            enemyDeathFrames.push({ key: 'Zombie_death' + i });
         }
 
         // 애니메이션 정의
@@ -140,10 +140,10 @@ export class Stage1FieldScene extends Phaser.Scene {
         }
         this.updateHPUI();
 
-         // 모바일 환경 감지
+        // 모바일 환경 감지
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-        if (isMobile){
+        if (isMobile) {
             // 왼쪽 버튼
             this.leftButton = this.add.tileSprite(140, 640, 210, 220, 'left_btn').setOrigin(1.0, 0.5).setInteractive();
             this.leftButton.setScale(0.4);
@@ -241,7 +241,7 @@ export class Stage1FieldScene extends Phaser.Scene {
             color: '#ffffff',
             padding: { top: 2, bottom: 2 },
         });
-        
+
         this.dialogues = this.cache.json.get('Stage1Dialogues');
 
         this.bgm = this.sound.add('castle', { loop: true });
@@ -315,7 +315,7 @@ export class Stage1FieldScene extends Phaser.Scene {
     handlePlayerAttackHit(attack, enemy) {
         if (!enemy.hp || enemy.hp <= 0) return;
 
-        if (this.mapCount === 1){
+        if (this.mapCount === 1) {
             // 데미지 적용
             enemy.hp -= this.atkDamage;
             this.updateEnemyHPBar(enemy);
@@ -358,7 +358,7 @@ export class Stage1FieldScene extends Phaser.Scene {
                 this.jumpCooldown = 0;
                 this.time.delayedCall(300, () => { enemy.setTexture('Zombie_death3'); });
 
-                if (!this.stageClear){
+                if (!this.stageClear) {
                     this.time.delayedCall(1000, () => {
                         warning.destroy();
 
@@ -405,7 +405,7 @@ export class Stage1FieldScene extends Phaser.Scene {
 
         // 이동 처리
         if ((this.cursors.right.isDown || this.isRightPressed) && this.attackCooldown <= 200 && !this.isStunned && !this.isMessages && !this.enemyFreeMove) {
-            if (this.mapCount < 1){
+            if (this.mapCount < 1) {
                 this.background.tilePositionX += 2.16;
                 this.player.setVelocityX(280);
             } else if (this.mapCount >= 1) {
@@ -448,7 +448,7 @@ export class Stage1FieldScene extends Phaser.Scene {
                 this.partner.anims.stop();
                 this.player.setTexture('Reed_walk1');
                 this.partner.setTexture('Aster_walk1');
-            }       
+            }
         }
 
         this.enemies.children.iterate((enemy) => {
@@ -505,7 +505,7 @@ export class Stage1FieldScene extends Phaser.Scene {
             });
         }
 
-        if (!isOnGround && this.jumpCooldown <= 120 && !this.isStunned){
+        if (!isOnGround && this.jumpCooldown <= 120 && !this.isStunned) {
             this.player.anims.stop();
             this.partner.anims.stop();
             this.player.setTexture('Reed_jump3');
@@ -518,15 +518,15 @@ export class Stage1FieldScene extends Phaser.Scene {
         }
 
         // 평타 공격
-        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0 && !this.isStunned && !this.isMessages && !this.enemyFreeMove){
+        if ((this.zKey.isDown || this.isAtkPressed) && this.attackCooldown <= 0 && !this.isStunned && !this.isMessages && !this.enemyFreeMove) {
             this.attackCooldown = this.attackCooldownTime;
             this.partner.anims.stop();
             // 내려찍기
-            if (!isOnGround){
+            if (!isOnGround) {
                 this.isStunned = true;
                 this.player.anims.stop();
                 this.partner.setFlipX(!this.player.flipX);
-                
+
                 this.player.setVelocityY(800);
                 this.partner.setVelocityY(800);
                 this.sound.add('sfx_attack').setVolume(0.5).play();
@@ -537,16 +537,16 @@ export class Stage1FieldScene extends Phaser.Scene {
                     this.partner.setY(600);
 
                     const attackEffect = this.playerAttacks.create(this.player.flipX ? this.player.x + 40 : this.player.x - 40, this.player.y, 'attack_effect');
-                    const attackEffect2 =  this.playerAttacks.create(this.partner.flipX ? this.partner.x + 40 : this.partner.x - 40, this.player.y, 'attack_effect');
+                    const attackEffect2 = this.playerAttacks.create(this.partner.flipX ? this.partner.x + 40 : this.partner.x - 40, this.player.y, 'attack_effect');
                     attackEffect.setFlipX(!this.player.flipX);
                     attackEffect.setScale(5.5);
                     attackEffect2.setFlipX(!this.partner.flipX);
                     attackEffect2.setScale(5.5);
-                    if (this.player.flipX){
+                    if (this.player.flipX) {
                         attackEffect.setVelocityX(60);
                         attackEffect2.setVelocityX(-80);
                     }
-                    else{
+                    else {
                         attackEffect.setVelocityX(-60);
                         attackEffect2.setVelocityX(80);
                     }
@@ -586,7 +586,7 @@ export class Stage1FieldScene extends Phaser.Scene {
         }
 
         // 맵 스크롤 
-        if (this.player.x > 1300){
+        if (this.player.x > 1300) {
             this.mapCount++;
             this.player.setPosition(-80, 500);
             this.partner.setVisible(false);
@@ -617,7 +617,7 @@ export class Stage1FieldScene extends Phaser.Scene {
         if (this.mapCount === 1 && this.player.x >= 100)
             this.showDialogue();
 
-        if (this.mapCount >= 2){
+        if (this.mapCount >= 2) {
             this.bgm.stop();
             this.scene.start('Stage1BossScene');
         }
@@ -642,6 +642,5 @@ export class Stage1FieldScene extends Phaser.Scene {
         // 피격 쿨타임 처리 
         if (this.damageCooldown > 0)
             this.damageCooldown -= delta;
-        console.log(this.currentIndex);
     }
 }
